@@ -39,7 +39,7 @@ public class MemberService {
         return GlobalResDto.success(null);
     }
 
-    public GlobalResDto<?> login(LoginReqDto loginReqDto, HttpServletResponse response) {
+    public GlobalResDto<LoginResDto> login(LoginReqDto loginReqDto, HttpServletResponse response) {
         Member member = isPresentMember(loginReqDto.getUserid());
         if(null==member){
             return GlobalResDto.fail("MEMBER_NOT_FOUND", "사용자를 찾을 수 없습니다.");

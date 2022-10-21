@@ -22,11 +22,13 @@ public class MemberController {
     private final JwtUtil jwtUtil;
     private final MemberService memberService;
 
+    //회원가입
     @PostMapping("/signup")
     public GlobalResDto<?> signup(@RequestBody @Valid MemberReqDto memberReqDto){
         return memberService.signup(memberReqDto);
     }
 
+    //로그인
     @PostMapping("/login")
     public GlobalResDto<?> login(@RequestBody @Valid LoginReqDto loginReqDto, HttpServletResponse response){
         return memberService.login(loginReqDto,response);
