@@ -51,18 +51,18 @@ public class JwtUtil {
     }
 
     // 토큰 생성
-    public TokenDto createAllToken(String nickname) {
-        return new TokenDto(createToken(nickname, "Access"), createToken(nickname, "Refresh"));
+    public TokenDto createAllToken(String userid) {
+        return new TokenDto(createToken(userid, "Access"), createToken(userid, "Refresh"));
     }
 
-    public String createToken(String nickname, String type) {
+    public String createToken(String userid, String type) {
 
         Date date = new Date();
 
         long time = type.equals("Access") ? ACCESS_TIME : REFRESH_TIME;
 
         return Jwts.builder()
-                .setSubject(nickname)
+                .setSubject(userid)
                 .setExpiration(new Date(date.getTime() + time))
                 .setIssuedAt(date)
                 .signWith(key, signatureAlgorithm)
@@ -100,14 +100,14 @@ public class JwtUtil {
         if (!tokenValidation(token)) return false;
 
         // DB에 저장한 토큰 비교
-        Optional<RefreshToken> refreshToken = refreshTokenRepository.findByAccountNickname(getNicknameFromToken(token));
+        Optional<RefreshToken> refreshToken = refreshTokenRepository.findByAccountuserid(getNicknameFromToken(token));
 
         return refreshToken.isPresent() && token.equals(refreshToken.get().getRefreshToken());
     }
 
     // 인증 객체 생성
-    public Authentication createAuthentication(String nickname) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(nickname);
+    public Authentication createAuthentication(String userid) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(userid);
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 

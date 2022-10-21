@@ -10,15 +10,14 @@ import lombok.NoArgsConstructor;
 public class GlobalResDto<T> {
 
     private boolean success;
-    private T data;
     private Error error;
 
 
-    public static <T> GlobalResDto<T> success(T data) {
-        return new GlobalResDto<>(true, data, null);
+    public static <T> GlobalResDto<T> success() {
+        return new GlobalResDto<>(true, null);
     }
 
     public static <T> GlobalResDto<T> fail(String code, String meg) {
-        return new GlobalResDto<>(false, null, new Error(code, meg));
+        return new GlobalResDto<>(false, new Error(code, meg));
     }
 }
