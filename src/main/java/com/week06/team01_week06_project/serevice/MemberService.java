@@ -5,6 +5,7 @@ import com.week06.team01_week06_project.domain.RefreshToken;
 import com.week06.team01_week06_project.dto.GlobalResDto;
 import com.week06.team01_week06_project.dto.request.LoginReqDto;
 import com.week06.team01_week06_project.dto.request.MemberReqDto;
+import com.week06.team01_week06_project.dto.response.LoginResDto;
 import com.week06.team01_week06_project.jwt.JwtUtil;
 import com.week06.team01_week06_project.jwt.TokenDto;
 import com.week06.team01_week06_project.respository.MemberRepository;
@@ -35,7 +36,7 @@ public class MemberService {
         Member member = new Member(memberReqDto);
 
         memberRepository.save(member);
-        return GlobalResDto.success();
+        return GlobalResDto.success(null);
     }
 
     public GlobalResDto<?> login(LoginReqDto loginReqDto, HttpServletResponse response) {
@@ -60,7 +61,7 @@ public class MemberService {
 
         setHeader(response,tokenDto);
 
-        return GlobalResDto.success();
+        return GlobalResDto.success(new LoginResDto(member.getUserid(),member.getName()));
     }
 
     @Transactional(readOnly = true)
