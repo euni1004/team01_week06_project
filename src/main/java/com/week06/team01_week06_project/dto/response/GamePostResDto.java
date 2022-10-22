@@ -16,12 +16,22 @@ public class GamePostResDto {
     private int numberOfPeople;
     private boolean recruitStatus;
 
-    public static GamePostResDto toGamePostResDto(GamePost gamePost, List<String> inGameNickname) {
+    public static GamePostResDto toDoneGamePostResDto(GamePost gamePost, List<String> inGameNickname) {
         return new GamePostResDto(
                 gamePost.getGameName(),
                 gamePost.getContent(),
                 inGameNickname,
                 gamePost.getNumberOfPeople(),
                 gamePost.getRecruitStatus());
+    }
+
+    public static GamePostResDto toGamePostResDto(GamePost gamePost) {
+        return new GamePostResDto(
+                gamePost.getGameName(),
+                gamePost.getContent(),
+                null,
+                gamePost.getNumberOfPeople(),
+                gamePost.getRecruitStatus()
+        );
     }
 }

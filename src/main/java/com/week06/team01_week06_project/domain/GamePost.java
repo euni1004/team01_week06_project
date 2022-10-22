@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @Entity
@@ -27,9 +28,8 @@ public class GamePost {
 
     private String content;
 
-//    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-//    @JoinColumn(name = "recruitstatusid")
-//    private List<RecruitStatus> inGameNickname;
+    @OneToMany(mappedBy = "gamePost", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<RecruitStatus> recruitStatuses;
 
     @Column(nullable = false)
     private String myIngameNickname;
@@ -57,8 +57,4 @@ public class GamePost {
         this.recruitStatus = recruitStatus;
     }
 
-
-//    public void setInGameNickname(RecruitStatus recruitStatus) {
-//        this.inGameNickname.add(recruitStatus);
-//    }
 }

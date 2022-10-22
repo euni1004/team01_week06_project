@@ -62,10 +62,16 @@ public class GamePostService {
         List<GamePostResDto> gamePostResDtos = new ArrayList<>();
 
         for (GamePost gamePost : gamePosts) {
-            List<String> inGameNickname = isPresentNickname(gamePost);
-            inGameNickname.add(0, gamePost.getMyIngameNickname());
-            GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(gamePost, inGameNickname);
-            gamePostResDtos.add(gamePostResDto);
+
+            if(gamePost.getRecruitStatus()){
+                GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(gamePost);
+                gamePostResDtos.add(gamePostResDto);
+            }else{
+                List<String> inGameNickname =  isPresentNickname(gamePost);
+                inGameNickname.add(0, gamePost.getMyIngameNickname());
+                GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(gamePost, inGameNickname);
+                gamePostResDtos.add(gamePostResDto);
+            }
         }
         return GlobalResDto.success(gamePostResDtos);
     }
@@ -75,10 +81,15 @@ public class GamePostService {
         if (gamePost == null) {
             return GlobalResDto.fail("GAMEPOST_NOT_FOUND", "게시물이 존재하지 않습니다.");
         }
-        List<String> inGameNickname = isPresentNickname(gamePost);
-        inGameNickname.add(0, gamePost.getMyIngameNickname());
-        GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(gamePost, inGameNickname);
-        return GlobalResDto.success(gamePostResDto);
+        if(gamePost.getRecruitStatus()){
+            GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(gamePost);
+            return GlobalResDto.success(gamePostResDto);
+        }else{
+            List<String> inGameNickname =  isPresentNickname(gamePost);
+            inGameNickname.add(0, gamePost.getMyIngameNickname());
+            GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(gamePost, inGameNickname);
+            return GlobalResDto.success(gamePostResDto);
+        }
     }
 
     @Transactional
@@ -94,7 +105,6 @@ public class GamePostService {
 
         RecruitStatus recruitStatus = new RecruitStatus(userDetails, gamePost, recruitMemberDto.getInGameNickname());
         recruitStatusRepository.save(recruitStatus);
-//        gamePost.setInGameNickname(recruitStatus);
 
         //만약 모집인원이 다찼다면 recruitstatus값을 false로 바꾸기
         if (recruitStatusRepository.countByGamePost(gamePost) == gamePost.getNumberOfPeople()) {
@@ -116,7 +126,7 @@ public class GamePostService {
             return GlobalResDto.fail("RECRUITSTATUS_NOT_FOUND", "참가신청한 이력이 없습니다.");
         }
 
-        recruitStatusRepository.deleteById(recruitStatus.getRecruitStatusId());
+        recruitStatusRepository.delete(recruitStatus);
 
         //gamepost에서 ingamenickname에서 참가취소한 사람 이름빼기
         gamePost.updateRecruitStatus(recruitStatusRepository.countByGamePost(gamePost) != gamePost.getNumberOfPeople());
@@ -140,8 +150,9 @@ public class GamePostService {
     }
 
     public List<String> isPresentNickname(GamePost gamePost) {
-        List<RecruitStatus> recruitStatuses = recruitStatusRepository.findAllBygamePost(gamePost).orElse(null);
+        List<RecruitStatus> recruitStatuses = gamePost.getRecruitStatuses();
         List<String> inGamenickname = new ArrayList<>();
+        assert recruitStatuses != null;
         for (RecruitStatus recruitStatus : recruitStatuses) {
             inGamenickname.add(recruitStatus.getInGameNickname());
         }

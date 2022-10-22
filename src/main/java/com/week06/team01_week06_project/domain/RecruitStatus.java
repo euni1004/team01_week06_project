@@ -11,10 +11,10 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "recruitStatuses")
 public class RecruitStatus {
 
     @Id
-    @Column(name = "recruitstatusid")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long recruitStatusId;
 
