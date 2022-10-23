@@ -15,23 +15,26 @@ public class GamePostResDto {
     private List<String> inGameNickname;
     private int numberOfPeople;
     private boolean recruitStatus;
+    private String imgurl;
 
-    public static GamePostResDto toDoneGamePostResDto(GamePost gamePost, List<String> inGameNickname) {
+    public static GamePostResDto toDoneGamePostResDto(GamePost gamePost, List<String> inGameNickname,String imgurl) {
         return new GamePostResDto(
                 gamePost.getGameName(),
                 gamePost.getContent(),
                 inGameNickname,
                 gamePost.getNumberOfPeople(),
-                gamePost.getRecruitStatus());
+                gamePost.getRecruitStatus(),
+                imgurl);
     }
 
-    public static GamePostResDto toGamePostResDto(GamePost gamePost) {
+    public static GamePostResDto toGamePostResDto(GamePost gamePost, String imgurl) {
         return new GamePostResDto(
                 gamePost.getGameName(),
                 gamePost.getContent(),
                 null,
                 gamePost.getNumberOfPeople(),
-                gamePost.getRecruitStatus()
+                gamePost.getRecruitStatus(),
+                imgurl
         );
     }
 }

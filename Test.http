@@ -3,9 +3,9 @@ POST http://localhost:8080/api/member/signup
 Content-Type: application/json
 
 {
-    "userid":"keh51641",
-    "name":"공은희",
-    "pw":"kong"
+  "userid": "keh51641",
+  "name": "공은희",
+  "pw": "kong"
 }
 
 ###회원가입2
@@ -13,9 +13,9 @@ POST http://localhost:8080/api/member/signup
 Content-Type: application/json
 
 {
-  "userid":"keh51642",
-  "name":"으니",
-  "pw":"kong"
+  "userid": "keh51642",
+  "name": "으니",
+  "pw": "kong"
 }
 
 ###로그인1
@@ -23,8 +23,8 @@ POST http://localhost:8080/api/member/login
 Content-Type: application/json
 
 {
-  "userid":"keh51641",
-  "pw":"kong"
+  "userid": "keh51641",
+  "pw": "kong"
 }
 
 ###로그인2
@@ -32,8 +32,8 @@ POST http://localhost:8080/api/member/login
 Content-Type: application/json
 
 {
-  "userid":"keh51642",
-  "pw":"kong"
+  "userid": "keh51642",
+  "pw": "kong"
 }
 
 ###모집글작성1
@@ -42,10 +42,10 @@ Content-Type: application/json
 Access_Token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJrZWg1MTY0MSIsImV4cCI6MTY2NjQwODMzNSwiaWF0IjoxNjY2NDA2NTM1fQ.aY3pre0pS7q4xjXr7FMe_04b6E8Gg7WvxyQAoidVQzU
 
 {
-  "gameName":"오버워치",
-  "content":"사람모집중입니다",
-  "inGameNickname":"으니",
-  "numberOfPeople":1
+  "gameName": "오버워치",
+  "content": "사람모집중입니다",
+  "inGameNickname": "으니",
+  "numberOfPeople": 1
 }
 
 ###참가신청2
@@ -54,7 +54,7 @@ Content-Type: application/json
 Access_Token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJrZWg1MTY0MiIsImV4cCI6MTY2NjQwODMzOSwiaWF0IjoxNjY2NDA2NTM5fQ.38K0KPGmPP7pHXm3E2y74QVugf8NORL6uBThJeOtpgw
 
 {
-  "inGameNickname":"달"
+  "inGameNickname": "달"
 }
 
 ###참가신청취소2

@@ -1,13 +1,16 @@
 package com.week06.team01_week06_project.domain;
 
 import com.week06.team01_week06_project.dto.request.GamepostReqDto;
+import com.week06.team01_week06_project.dto.request.PutGamepostReqDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
 
+@Setter
 @Getter
 @Entity
 @NoArgsConstructor
@@ -40,13 +43,22 @@ public class GamePost {
     @Column(nullable = false)
     private boolean recruitStatus;
 
-    public GamePost(Member member, GamepostReqDto gamepostReqDto) {
+
+    private String path;
+
+    public GamePost(Member member, GamepostReqDto gamepostReqDto,String path) {
         this.member = member;
         this.gameName = gamepostReqDto.getGameName();
         this.content = gamepostReqDto.getContent();
         this.myIngameNickname = gamepostReqDto.getInGameNickname();
         this.numberOfPeople = gamepostReqDto.getNumberOfPeople();
         this.recruitStatus = true;
+        this.path = path;
+    }
+
+    public void updatePost(PutGamepostReqDto putGamepostReqDto){
+        this.content = putGamepostReqDto.getContent();
+        this.numberOfPeople = putGamepostReqDto.getNumberOfPeople();
     }
 
     public boolean getRecruitStatus() {

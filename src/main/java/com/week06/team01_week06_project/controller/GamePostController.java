@@ -2,12 +2,14 @@ package com.week06.team01_week06_project.controller;
 
 import com.week06.team01_week06_project.dto.GlobalResDto;
 import com.week06.team01_week06_project.dto.request.GamepostReqDto;
+import com.week06.team01_week06_project.dto.request.PutGamepostReqDto;
 import com.week06.team01_week06_project.dto.request.RecruitMemberDto;
 import com.week06.team01_week06_project.security.UserDetailsImpl;
 import com.week06.team01_week06_project.serevice.GamePostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,12 +19,20 @@ public class GamePostController {
 
     //게임모집글 작성
     @PostMapping("/gamepost")
-    public GlobalResDto<?> generateGamePost(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody GamepostReqDto gamepostReqDto) {
+    public GlobalResDto<?> generateGamePost(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                            @RequestPart(value = "json") GamepostReqDto gamepostReqDto,
+                                            @RequestPart("file") MultipartFile multipartFile) {
         Long memberid = userDetails.getAccount().getMemberId();
-        return gamePostService.generateGamePost(memberid, gamepostReqDto);
+        return gamePostService.generateGamePost(memberid, gamepostReqDto, multipartFile);
     }
 
     //게임모집글 수정
+    @PutMapping("/gamepost/{gamepostid}")
+    public GlobalResDto<?> putGamePost(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                       @RequestBody PutGamepostReqDto putGamepostReqDto,
+                                       @PathVariable Long gamepostid) {
+        return gamePostService.putGamePost(userDetails, putGamepostReqDto, gamepostid);
+    }
 
     //게임모집글 삭제
     @DeleteMapping("/gamepost/{gamepostid}")
@@ -45,15 +55,15 @@ public class GamePostController {
     //게임 신청
     @PutMapping("/gamepost/recruit/{gamepostid}")
     public GlobalResDto<?> participationGame(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                       @RequestBody RecruitMemberDto recruitMemberDto,
-                                       @PathVariable Long gamepostid){
-        return gamePostService.participationGame(userDetails, recruitMemberDto,gamepostid);
+                                             @RequestBody RecruitMemberDto recruitMemberDto,
+                                             @PathVariable Long gamepostid) {
+        return gamePostService.participationGame(userDetails, recruitMemberDto, gamepostid);
     }
 
     //참가신청 취소
     @DeleteMapping("/gamepost/recruit/{gamepostid}")
     public GlobalResDto<?> cancelParticipationGame(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                   @PathVariable Long gamepostid){
-        return gamePostService.cancelParticipationGame(userDetails,gamepostid);
+                                                   @PathVariable Long gamepostid) {
+        return gamePostService.cancelParticipationGame(userDetails, gamepostid);
     }
 }
