@@ -3,13 +3,13 @@ package com.week06.team01_week06_project.controller;
 import com.week06.team01_week06_project.dto.GlobalResDto;
 import com.week06.team01_week06_project.dto.request.LoginReqDto;
 import com.week06.team01_week06_project.dto.request.MemberReqDto;
+import com.week06.team01_week06_project.dto.request.TestDto;
 import com.week06.team01_week06_project.jwt.JwtUtil;
+import com.week06.team01_week06_project.security.UserDetailsImpl;
 import com.week06.team01_week06_project.serevice.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -22,6 +22,12 @@ public class MemberController {
     private final JwtUtil jwtUtil;
     private final MemberService memberService;
 
+    @PostMapping("/idck")
+    public GlobalResDto<?> idck(@RequestBody TestDto testDto){
+        return memberService.idck(testDto);
+    }
+
+
     //회원가입
     @PostMapping("/signup")
     public GlobalResDto<?> signup(@RequestBody @Valid MemberReqDto memberReqDto){
@@ -33,4 +39,14 @@ public class MemberController {
     public GlobalResDto<?> login(@RequestBody @Valid LoginReqDto loginReqDto, HttpServletResponse response){
         return memberService.login(loginReqDto,response);
     }
+
+//    @DeleteMapping("/byemember")
+//    public GlobalResDto<?> deleteMember(@AuthenticationPrincipal UserDetailsImpl userDetails){
+//
+//    }
+
+//    @DeleteMapping("/byemember")
+//    public GlobalResDto<?> deleMember(@RequestBody TestDto testDto){
+//        return memberService.deleMember(testDto);
+//    }
 }

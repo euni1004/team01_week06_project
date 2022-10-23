@@ -5,6 +5,7 @@ import com.week06.team01_week06_project.domain.RefreshToken;
 import com.week06.team01_week06_project.dto.GlobalResDto;
 import com.week06.team01_week06_project.dto.request.LoginReqDto;
 import com.week06.team01_week06_project.dto.request.MemberReqDto;
+import com.week06.team01_week06_project.dto.request.TestDto;
 import com.week06.team01_week06_project.dto.response.LoginResDto;
 import com.week06.team01_week06_project.jwt.JwtUtil;
 import com.week06.team01_week06_project.jwt.TokenDto;
@@ -41,10 +42,10 @@ public class MemberService {
 
     public GlobalResDto<LoginResDto> login(LoginReqDto loginReqDto, HttpServletResponse response) {
         Member member = isPresentMember(loginReqDto.getUserid());
-        if(null==member){
+        if (null == member) {
             return GlobalResDto.fail("MEMBER_NOT_FOUND", "사용자를 찾을 수 없습니다.");
         }
-        if(!member.validatePassword(passwordEncoder,loginReqDto.getPw())){
+        if (!member.validatePassword(passwordEncoder, loginReqDto.getPw())) {
             return GlobalResDto.fail("WRONG_PASSWORD", "비밀번호가 틀렸습니다.");
         }
 
@@ -59,9 +60,16 @@ public class MemberService {
             refreshTokenRepository.save(newToken);
         }
 
-        setHeader(response,tokenDto);
+        setHeader(response, tokenDto);
 
-        return GlobalResDto.success(new LoginResDto(member.getUserid(),member.getName()));
+        return GlobalResDto.success(new LoginResDto(member.getUserid(), member.getName()));
+    }
+
+    public GlobalResDto<?> idck(TestDto testDto) {
+        if (null != isPresentMember(testDto.getUserid())) {
+            return GlobalResDto.fail("DUPLICATED_NICKNAME", "이미 사용중인 닉네임입니다.");
+        }
+        return GlobalResDto.success("사용가능한 아이디 입니다.");
     }
 
     @Transactional(readOnly = true)
@@ -75,5 +83,18 @@ public class MemberService {
         response.addHeader(JwtUtil.REFRESH_TOKEN, tokenDto.getRefreshToken());
     }
 
+//    @Transactional
+//    public GlobalResDto<?> deleMember(TestDto testDto) {
+//
+//        Member member = memberRepository.findByName(testDto.getName());
+//        memberRepository.delete(member);
+//        return GlobalResDto.success(null);
+//    }
 
+//    public GlobalResDto<?> checkmember(String userid) {
+//        if (null != isPresentMember(userid)) {
+//            return GlobalResDto.fail("DUPLICATED_NICKNAME", "이미 사용중인 닉네임입니다.");
+//        }
+//        return GlobalResDto.success(null);
+//    }
 }
