@@ -15,7 +15,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class GamePost {
+public class GamePost extends Timestamped{
 
     @Id
     @Column(name = "gamepostid")

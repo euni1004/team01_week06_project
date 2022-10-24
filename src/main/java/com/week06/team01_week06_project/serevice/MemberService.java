@@ -9,8 +9,11 @@ import com.week06.team01_week06_project.dto.request.TestDto;
 import com.week06.team01_week06_project.dto.response.LoginResDto;
 import com.week06.team01_week06_project.jwt.JwtUtil;
 import com.week06.team01_week06_project.jwt.TokenDto;
+import com.week06.team01_week06_project.respository.GamePostRepository;
 import com.week06.team01_week06_project.respository.MemberRepository;
+import com.week06.team01_week06_project.respository.RecruitStatusRepository;
 import com.week06.team01_week06_project.respository.RefreshTokenRepository;
+import com.week06.team01_week06_project.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,6 +30,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final GamePostRepository gamePostRepository;
+    private final RecruitStatusRepository recruitStatusRepository;
 
     public GlobalResDto<?> signup(MemberReqDto memberReqDto) {
         if(null!=isPresentMember(memberReqDto.getUserid())){
@@ -72,6 +77,22 @@ public class MemberService {
         return GlobalResDto.success("사용가능한 아이디 입니다.");
     }
 
+    @Transactional
+    public GlobalResDto<?> deleMember(UserDetailsImpl userDetails, TestDto testDto) {
+
+        Member member = isPresentMember(userDetails.getAccount().getUserid());
+        if (null == member) {
+            return GlobalResDto.fail("MEMBER_NOT_FOUND", "사용자를 찾을 수 없습니다.");
+        }
+
+        if(!member.validatePassword(passwordEncoder,testDto.getPw())){
+            return GlobalResDto.fail("FAIL_DELETE", "비밀번호가 다릅니다.");
+        }
+
+        memberRepository.deleteById(member.getMemberId());
+        return GlobalResDto.success(null);
+    }
+
     @Transactional(readOnly = true)
     public Member isPresentMember(String userid) {
         Optional<Member> member = memberRepository.findByUserid(userid);
@@ -83,18 +104,4 @@ public class MemberService {
         response.addHeader(JwtUtil.REFRESH_TOKEN, tokenDto.getRefreshToken());
     }
 
-//    @Transactional
-//    public GlobalResDto<?> deleMember(TestDto testDto) {
-//
-//        Member member = memberRepository.findByName(testDto.getName());
-//        memberRepository.delete(member);
-//        return GlobalResDto.success(null);
-//    }
-
-//    public GlobalResDto<?> checkmember(String userid) {
-//        if (null != isPresentMember(userid)) {
-//            return GlobalResDto.fail("DUPLICATED_NICKNAME", "이미 사용중인 닉네임입니다.");
-//        }
-//        return GlobalResDto.success(null);
-//    }
 }

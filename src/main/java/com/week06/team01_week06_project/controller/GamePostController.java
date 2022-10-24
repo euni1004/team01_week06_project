@@ -11,6 +11,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
+
 @RestController
 @RequiredArgsConstructor
 public class GamePostController {
@@ -21,7 +23,7 @@ public class GamePostController {
     @PostMapping("/gamepost")
     public GlobalResDto<?> generateGamePost(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                             @RequestPart(value = "json") GamepostReqDto gamepostReqDto,
-                                            @RequestPart("file") MultipartFile multipartFile) {
+                                            @Valid @RequestPart("file") MultipartFile multipartFile) {
         Long memberid = userDetails.getAccount().getMemberId();
         return gamePostService.generateGamePost(memberid, gamepostReqDto, multipartFile);
     }

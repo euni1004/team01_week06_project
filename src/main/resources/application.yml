@@ -17,6 +17,11 @@ spring:
     hibernate:
       ddl-auto: update
 
+  http:
+    multipart:
+      max-file-size: 256KB
+      max-request-size: 256KB
+
 #    database-platform: org.hibernate.dialect.H2Dialect
 #    hibernate:
 #      ddl-auto: create-drop
