@@ -150,6 +150,17 @@ public class GamePostService {
         return inGamenickname;
     }
 
+    public GlobalResDto<?> searchPost(String searchKeyword) {
+        if(searchKeyword == null) {
+            return GlobalResDto.fail ( "DATA_NOT_FOUND", "글자를 입력해주세요" );
+        }
+        List<GamePost> findGamePosts = gamePostRepository.findAllByGameNameContaining ( searchKeyword );
+        if(findGamePosts == null) {
+            return GlobalResDto.fail ( "SEARCH_NOT_FOUND", "게시글을 찾을 수 없습니다." );
+        }
+        return GlobalResDto.success ( findGamePosts );
+    }
+
 
 //    public GlobalResDto<GamePost> checkValidation(Long gamepostid, UserDetailsImpl userDetails){
 //        GamePost gamePost = isPresentGamePost(gamepostid);

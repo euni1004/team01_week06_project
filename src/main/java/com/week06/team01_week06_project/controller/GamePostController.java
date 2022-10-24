@@ -54,4 +54,9 @@ public class GamePostController {
         return gamePostService.getGamePost(gamepostid);
     }
 
+    @GetMapping("/gamePost/search")
+    public GlobalResDto<?> searchPost(@RequestParam String gameName) {
+        return gamePostService.searchPost(gameName);
+    }
+
 }
