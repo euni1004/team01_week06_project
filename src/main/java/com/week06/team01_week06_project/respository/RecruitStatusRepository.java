@@ -5,6 +5,7 @@ import com.week06.team01_week06_project.domain.Member;
 import com.week06.team01_week06_project.domain.RecruitStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +14,8 @@ public interface RecruitStatusRepository extends JpaRepository<RecruitStatus,Lon
     Optional<RecruitStatus> findByGamePostAndMember(GamePost gamePost, Member member);
 
     Long countByGamePost(GamePost gamePost);
+
+    List<RecruitStatus> findAllByMember(Member member);
 
     Optional<List<RecruitStatus>> findAllBygamePost(GamePost gamePost);
 

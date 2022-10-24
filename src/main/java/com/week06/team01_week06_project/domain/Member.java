@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -27,6 +29,12 @@ public class Member extends Timestamped{
 
     @Column(nullable = false)
     private String pw;
+
+    @OneToMany(mappedBy = "member")
+    List<GamePost> gamePost = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    List<RecruitStatus> recruitStatus = new ArrayList<>();
 
     public Member(MemberReqDto memberReqDto) {
         this.userid = memberReqDto.getUserid();
