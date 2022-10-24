@@ -10,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 public class GamePostResDto {
 
+    private Long gamePostId;
     private String gameName;
     private String content;
     private List<String> inGameNickname;
@@ -19,6 +20,7 @@ public class GamePostResDto {
 
     public static GamePostResDto toDoneGamePostResDto(GamePost gamePost, List<String> inGameNickname,String imgurl) {
         return new GamePostResDto(
+                gamePost.getGamePostId(),
                 gamePost.getGameName(),
                 gamePost.getContent(),
                 inGameNickname,
@@ -29,6 +31,7 @@ public class GamePostResDto {
 
     public static GamePostResDto toGamePostResDto(GamePost gamePost, String imgurl) {
         return new GamePostResDto(
+                gamePost.getGamePostId(),
                 gamePost.getGameName(),
                 gamePost.getContent(),
                 null,

@@ -20,14 +20,17 @@ public class AmazonS3ResourceStorage {
     private String bucket;
     private final AmazonS3Client amazonS3Client;
 
-    public void store(String  path, MultipartFile multipartFile) {
+    public int store(String  path, MultipartFile multipartFile) {
         File file = new File(Objects.requireNonNull(multipartFile.getOriginalFilename()));
         try {
             file = convert(multipartFile);
             amazonS3Client.putObject(new PutObjectRequest(bucket, path, file)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
+            System.out.println("here5");
+            return 1;
         } catch (Exception e) {
-            throw new RuntimeException();
+//            throw new RuntimeException();
+            return 0;
         } finally {
             if (file.exists()) {
                 file.delete();

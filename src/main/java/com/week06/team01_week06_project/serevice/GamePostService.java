@@ -41,7 +41,12 @@ public class GamePostService {
         }
 
         String path = MultipartUtil.createPath(MultipartUtil.createFileId(), MultipartUtil.getFormat(multipartFile.getContentType()));
-        amazonS3ResourceStorage.store(path, multipartFile);
+
+        int num = amazonS3ResourceStorage.store(path, multipartFile);
+
+        if(num==0){
+            path = "/images/normal_game.png";
+        }
 
         GamePost gamePost = new GamePost(member, gamepostReqDto, path);
         gamePostRepository.save(gamePost);
@@ -75,7 +80,11 @@ public class GamePostService {
         if (!userDetails.getAccount().getMemberId().equals(gamePost.getMember().getMemberId())) {
             return GlobalResDto.fail("NO_PERMISSION", "게시물은 자신이 작성한 게시물만 삭제할 수 있습니다.");
         }
-        amazonS3ResourceStorage.delimg(gamePost.getPath());
+
+        if(!gamePost.getPath().equals("/images/normal_game.png")){
+            amazonS3ResourceStorage.delimg(gamePost.getPath());
+        }
+
         recruitStatusRepository.deleteAllByGamePost(gamePost);
         gamePostRepository.deleteById(gamePost.getGamePostId());
         return GlobalResDto.success(null);
