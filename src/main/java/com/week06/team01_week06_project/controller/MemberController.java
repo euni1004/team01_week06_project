@@ -39,8 +39,6 @@ public class MemberController {
         return memberService.login(loginReqDto,response);
     }
 
-
-
     //로그인한상태에서 탈퇴 가능 userid,pw 필요
     //게시물과 참가신청을 하지 않은사람만 탈퇴 가능
     @DeleteMapping("/byemember")

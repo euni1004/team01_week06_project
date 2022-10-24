@@ -10,23 +10,23 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("")
+@RequestMapping("/gamePost/recruit")
 public class RecruitStatusController {
 
     private final RecruitStatusService recruitStatusService;
 
     //게임 신청
-    @PutMapping("/gamepost/recruit/{gamepostid}")
+    @PutMapping("/{gamePostId}")
     public GlobalResDto<?> participationGame(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                              @RequestBody RecruitMemberDto recruitMemberDto,
-                                             @PathVariable Long gamepostid) {
-        return recruitStatusService.participationGame(userDetails, recruitMemberDto, gamepostid);
+                                             @PathVariable Long gamePostId) {
+        return recruitStatusService.participationGame(userDetails, recruitMemberDto, gamePostId);
     }
 
     //참가신청 취소
-    @DeleteMapping("/gamepost/recruit/{gamepostid}")
+    @DeleteMapping("/{gamePostId}")
     public GlobalResDto<?> cancelParticipationGame(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                   @PathVariable Long gamepostid) {
-        return recruitStatusService.cancelParticipationGame(userDetails, gamepostid);
+                                                   @PathVariable Long gamePostId) {
+        return recruitStatusService.cancelParticipationGame(userDetails, gamePostId);
     }
 }
