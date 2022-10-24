@@ -54,18 +54,4 @@ public class GamePostController {
         return gamePostService.getGamePost(gamepostid);
     }
 
-    //게임 신청
-    @PutMapping("/gamepost/recruit/{gamepostid}")
-    public GlobalResDto<?> participationGame(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                             @RequestBody RecruitMemberDto recruitMemberDto,
-                                             @PathVariable Long gamepostid) {
-        return gamePostService.participationGame(userDetails, recruitMemberDto, gamepostid);
-    }
-
-    //참가신청 취소
-    @DeleteMapping("/gamepost/recruit/{gamepostid}")
-    public GlobalResDto<?> cancelParticipationGame(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                   @PathVariable Long gamepostid) {
-        return gamePostService.cancelParticipationGame(userDetails, gamepostid);
-    }
 }
