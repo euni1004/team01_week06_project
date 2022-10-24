@@ -1,7 +1,8 @@
 package com.week06.team01_week06_project.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.week06.team01_week06_project.dto.GlobalResDto;
+import com.week06.team01_week06_project.exception.CustomException;
+import com.week06.team01_week06_project.exception.Error;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException,CustomException {
 
         String accessToken = jwtUtil.getHeaderToken(request, "Access");
         String refreshToken = jwtUtil.getHeaderToken(request, "Refresh");
@@ -53,7 +54,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         response.setStatus(status.value());
         response.setContentType("application/json");
         try {
-            String json = new ObjectMapper().writeValueAsString(GlobalResDto.fail("BAD_REQUEST", msg));
+            String json = new ObjectMapper().writeValueAsString(new Error(status.value(),"T001",msg));
             response.getWriter().write(json);
         } catch (Exception e) {
             log.error(e.getMessage());

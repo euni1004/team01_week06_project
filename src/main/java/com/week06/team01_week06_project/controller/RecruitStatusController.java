@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/gamePost/recruit")
+@RequestMapping("/gamepost/recruit")
 public class RecruitStatusController {
 
     private final RecruitStatusService recruitStatusService;

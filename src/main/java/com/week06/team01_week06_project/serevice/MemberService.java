@@ -7,6 +7,8 @@ import com.week06.team01_week06_project.dto.request.LoginReqDto;
 import com.week06.team01_week06_project.dto.request.MemberReqDto;
 import com.week06.team01_week06_project.dto.request.TestDto;
 import com.week06.team01_week06_project.dto.response.LoginResDto;
+import com.week06.team01_week06_project.exception.CustomException;
+import com.week06.team01_week06_project.exception.ErrorCode;
 import com.week06.team01_week06_project.jwt.JwtUtil;
 import com.week06.team01_week06_project.jwt.TokenDto;
 import com.week06.team01_week06_project.respository.GamePostRepository;
@@ -30,12 +32,10 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final GamePostRepository gamePostRepository;
-    private final RecruitStatusRepository recruitStatusRepository;
 
     public GlobalResDto<?> signup(MemberReqDto memberReqDto) {
         if(null!=isPresentMember(memberReqDto.getUserid())){
-            return GlobalResDto.fail("DUPLICATED_NICKNAME", "이미 사용중인 닉네임입니다.");
+            throw new CustomException(ErrorCode.DUPLICATED_NICKNAME);
         }
 
         memberReqDto.setEncodePwd(passwordEncoder.encode(memberReqDto.getPw()));
@@ -48,10 +48,10 @@ public class MemberService {
     public GlobalResDto<LoginResDto> login(LoginReqDto loginReqDto, HttpServletResponse response) {
         Member member = isPresentMember(loginReqDto.getUserid());
         if (null == member) {
-            return GlobalResDto.fail("MEMBER_NOT_FOUND", "사용자를 찾을 수 없습니다.");
+            throw new CustomException(ErrorCode.NOT_FOUND_MEMBER);
         }
         if (!member.validatePassword(passwordEncoder, loginReqDto.getPw())) {
-            return GlobalResDto.fail("WRONG_PASSWORD", "비밀번호가 틀렸습니다.");
+            throw new CustomException(ErrorCode.WRONG_PASSWORD);
         }
 
         TokenDto tokenDto = jwtUtil.createAllToken(loginReqDto.getUserid());
@@ -72,7 +72,7 @@ public class MemberService {
 
     public GlobalResDto<?> idck(TestDto testDto) {
         if (null != isPresentMember(testDto.getUserid())) {
-            return GlobalResDto.fail("DUPLICATED_NICKNAME", "이미 사용중인 닉네임입니다.");
+            throw new CustomException(ErrorCode.DUPLICATED_NICKNAME);
         }
         return GlobalResDto.success("사용가능한 아이디 입니다.");
     }
@@ -82,11 +82,11 @@ public class MemberService {
 
         Member member = isPresentMember(userDetails.getAccount().getUserid());
         if (null == member) {
-            return GlobalResDto.fail("MEMBER_NOT_FOUND", "사용자를 찾을 수 없습니다.");
+            throw new CustomException(ErrorCode.NOT_FOUND_MEMBER);
         }
 
         if(!member.validatePassword(passwordEncoder,testDto.getPw())){
-            return GlobalResDto.fail("FAIL_DELETE", "비밀번호가 다릅니다.");
+            throw new CustomException(ErrorCode.WRONG_PASSWORD);
         }
 
         memberRepository.deleteById(member.getMemberId());

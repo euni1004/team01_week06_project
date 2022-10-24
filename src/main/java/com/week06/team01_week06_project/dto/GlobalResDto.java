@@ -11,14 +11,11 @@ public class GlobalResDto<T> {
 
     private boolean success;
     private T data;
-    private Error error;
 
 
     public static <T> GlobalResDto<T> success(T data) {
-        return new GlobalResDto<>(true,data, null);
+        return new GlobalResDto<>(true,data);
     }
 
-    public static <T> GlobalResDto<T> fail(String code, String meg) {
-        return new GlobalResDto<>(false, null,new Error(code, meg));
-    }
+
 }

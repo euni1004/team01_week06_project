@@ -8,6 +8,8 @@ import com.week06.team01_week06_project.dto.request.GamepostReqDto;
 import com.week06.team01_week06_project.dto.request.PutGamepostReqDto;
 import com.week06.team01_week06_project.dto.request.RecruitMemberDto;
 import com.week06.team01_week06_project.dto.response.GamePostResDto;
+import com.week06.team01_week06_project.exception.CustomException;
+import com.week06.team01_week06_project.exception.ErrorCode;
 import com.week06.team01_week06_project.respository.GamePostRepository;
 import com.week06.team01_week06_project.respository.MemberRepository;
 import com.week06.team01_week06_project.respository.RecruitStatusRepository;
@@ -35,18 +37,19 @@ public class GamePostService {
 
 
     @Transactional
-    public GlobalResDto<?> generateGamePost(Long memberid, GamepostReqDto gamepostReqDto, MultipartFile multipartFile) {
-        Member member = isPresentMember(memberid);
+    public GlobalResDto<?> generateGamePost(Long memberId, GamepostReqDto gamepostReqDto, MultipartFile multipartFile) {
+        Member member = isPresentMember(memberId);
+
         if (member == null) {
-            return GlobalResDto.fail("MEMBER_NOT_FOUND", "사용자가 존재하지 않습니다.");
+            throw new CustomException(ErrorCode.NOT_FOUND_MEMBER);
         }
 
         String path = MultipartUtil.createPath(MultipartUtil.createFileId(), MultipartUtil.getFormat(multipartFile.getContentType()));
 
         int num = amazonS3ResourceStorage.store(path, multipartFile);
 
-        if(num==0){
-            path = "/images/normal_game.png";
+        if (num == 0) {
+            path = "/images/normal_game.jpg";
         }
 
         GamePost gamePost = new GamePost(member, gamepostReqDto, path);
@@ -56,33 +59,33 @@ public class GamePostService {
 
     //모집글 수정하는 곳
     @Transactional
-    public GlobalResDto<GamePostResDto> putGamePost(UserDetailsImpl userDetails, PutGamepostReqDto putGamepostReqDto, Long gamepostid) {
+    public GlobalResDto<GamePostResDto> putGamePost(UserDetailsImpl userDetails, PutGamepostReqDto putGamepostReqDto, Long gamePostId) {
 
-        GamePost gamePost = isPresentGamePost(gamepostid);
+        GamePost gamePost = isPresentGamePost(gamePostId);
         if (gamePost == null) {
-            return GlobalResDto.fail("GAMEPOST_NOT_FOUND", "게시물이 존재하지 않습니다.");
+            throw new CustomException(ErrorCode.NOT_FOUND_GAMEPOST);
         }
         if (!userDetails.getAccount().getMemberId().equals(gamePost.getMember().getMemberId())) {
-            return GlobalResDto.fail("NO_PERMISSION", "게시물은 자신이 작성한 게시물만 수정할 수 있습니다.");
+            throw new CustomException(ErrorCode.NO_PERMISSION_CHANGE);
         }
         gamePost.updatePost(putGamepostReqDto);
 
-        return GlobalResDto.success(getGamePost(gamepostid).getData());
+        return GlobalResDto.success(getGamePost(gamePostId).getData());
 
     }
 
     @Transactional
-    public GlobalResDto<?> deleteGamePost(Long gamepostid, UserDetailsImpl userDetails) {
+    public GlobalResDto<?> deleteGamePost(Long gamePostId, UserDetailsImpl userDetails) {
 
-        GamePost gamePost = isPresentGamePost(gamepostid);
+        GamePost gamePost = isPresentGamePost(gamePostId);
         if (gamePost == null) {
-            return GlobalResDto.fail("GAMEPOST_NOT_FOUND", "게시물이 존재하지 않습니다.");
+            throw new CustomException(ErrorCode.NOT_FOUND_GAMEPOST);
         }
         if (!userDetails.getAccount().getMemberId().equals(gamePost.getMember().getMemberId())) {
-            return GlobalResDto.fail("NO_PERMISSION", "게시물은 자신이 작성한 게시물만 삭제할 수 있습니다.");
+            throw new CustomException(ErrorCode.NO_PERMISSION_DELETE);
         }
 
-        if(!gamePost.getPath().equals("/images/normal_game.png")){
+        if (!gamePost.getPath().equals("/images/normal_game.jpg")) {
             amazonS3ResourceStorage.delimg(gamePost.getPath());
         }
 
@@ -91,63 +94,70 @@ public class GamePostService {
         return GlobalResDto.success(null);
     }
 
-    public GlobalResDto<List<GamePostResDto>> getAllGamePost() {
-        List<GamePost> gamePosts = gamePostRepository.findAll();
+    public GlobalResDto<List<GamePostResDto>> getAllGamePostTrue() {
+        List<GamePost> gamePosts = gamePostRepository.findAllByRecruitStatus(true);
 
         //원하는 dto로 바뀌기 위해 list
         List<GamePostResDto> gamePostResDtos = new ArrayList<>();
 
         for (GamePost gamePost : gamePosts) {
-            String imgurl = amazonS3ResourceStorage.getimg(gamePost.getPath());
-            if (gamePost.getRecruitStatus()) {
-                GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(gamePost,imgurl);
-                gamePostResDtos.add(gamePostResDto);
-            } else {
-                List<String> inGameNickname = isPresentNickname(gamePost);
-                inGameNickname.add(0, gamePost.getMyIngameNickname());
-                GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(gamePost, inGameNickname,imgurl);
-                gamePostResDtos.add(gamePostResDto);
-            }
+            String imgUrl = amazonS3ResourceStorage.getimg(gamePost.getPath());
+            GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(gamePost, imgUrl);
+            gamePostResDtos.add(gamePostResDto);
         }
         return GlobalResDto.success(gamePostResDtos);
     }
 
-    public GlobalResDto<GamePostResDto> getGamePost(Long gamepostid) {
-        GamePost gamePost = isPresentGamePost(gamepostid);
-        if (gamePost == null) {
-            return GlobalResDto.fail("GAMEPOST_NOT_FOUND", "게시물이 존재하지 않습니다.");
+    public GlobalResDto<List<GamePostResDto>> getAllGamePostFalse() {
+        List<GamePost> gamePosts = gamePostRepository.findAllByRecruitStatus(true);
+
+        //원하는 dto로 바뀌기 위해 list
+        List<GamePostResDto> gamePostResDtos = new ArrayList<>();
+        for (GamePost gamePost : gamePosts) {
+            String imgUrl = amazonS3ResourceStorage.getimg(gamePost.getPath());
+            List<String> inGameNickname = isPresentNickname(gamePost);
+            inGameNickname.add(0, gamePost.getMyIngameNickname());
+            GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(gamePost, inGameNickname, imgUrl);
+            gamePostResDtos.add(gamePostResDto);
         }
-        String imgurl = amazonS3ResourceStorage.getimg(gamePost.getPath());
+        return GlobalResDto.success(gamePostResDtos);
+    }
+
+    public GlobalResDto<GamePostResDto> getGamePost(Long gamePostId) {
+        GamePost gamePost = isPresentGamePost(gamePostId);
+        if (gamePost == null) {
+            throw new CustomException(ErrorCode.NOT_FOUND_GAMEPOST);
+        }
+        String imgUrl = amazonS3ResourceStorage.getimg(gamePost.getPath());
         if (gamePost.getRecruitStatus()) {
-            GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(gamePost,imgurl);
+            GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(gamePost, imgUrl);
             return GlobalResDto.success(gamePostResDto);
         } else {
             List<String> inGameNickname = isPresentNickname(gamePost);
             inGameNickname.add(0, gamePost.getMyIngameNickname());
-            GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(gamePost, inGameNickname,imgurl);
+            GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(gamePost, inGameNickname, imgUrl);
             return GlobalResDto.success(gamePostResDto);
         }
     }
-
 
     public Member isPresentMember(Long memberId) {
         Optional<Member> member = memberRepository.findById(memberId);
         return member.orElse(null);
     }
 
-    public GamePost isPresentGamePost(Long gamepostid) {
-        Optional<GamePost> gamePost = gamePostRepository.findById(gamepostid);
+    public GamePost isPresentGamePost(Long gamePostId) {
+        Optional<GamePost> gamePost = gamePostRepository.findById(gamePostId);
         return gamePost.orElse(null);
     }
 
     public List<String> isPresentNickname(GamePost gamePost) {
         List<RecruitStatus> recruitStatuses = gamePost.getRecruitStatuses();
-        List<String> inGamenickname = new ArrayList<>();
+        List<String> inGameNickName = new ArrayList<>();
         assert recruitStatuses != null;
         for (RecruitStatus recruitStatus : recruitStatuses) {
-            inGamenickname.add(recruitStatus.getInGameNickname());
+            inGameNickName.add(recruitStatus.getInGameNickname());
         }
-        return inGamenickname;
+        return inGameNickName;
     }
 
 

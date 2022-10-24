@@ -43,9 +43,14 @@ public class GamePostController {
     }
 
     //모든 게임 모집글
-    @GetMapping("/showpost")
-    public GlobalResDto<?> getAllGamePost() {
-        return gamePostService.getAllGamePost();
+    @GetMapping("/showpost/recruittrue")
+    public GlobalResDto<?> getAllGamePostTrue() {
+        return gamePostService.getAllGamePostTrue();
+    }
+
+    @GetMapping("/showpost/recruitfalse")
+    public GlobalResDto<?> getAllGamePostFalse() {
+        return gamePostService.getAllGamePostFalse();
     }
 
     //모집글 1개
