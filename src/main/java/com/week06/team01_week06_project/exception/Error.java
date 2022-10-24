@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Error {
 
-    private int httpStatus;
+    private int status;
 
     private String code;
 

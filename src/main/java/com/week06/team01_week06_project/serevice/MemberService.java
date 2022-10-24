@@ -78,14 +78,14 @@ public class MemberService {
     }
 
     @Transactional
-    public GlobalResDto<?> deleMember(UserDetailsImpl userDetails, TestDto testDto) {
+    public GlobalResDto<?> deleMember(UserDetailsImpl userDetails, LoginReqDto loginReqDto) {
 
         Member member = isPresentMember(userDetails.getAccount().getUserid());
         if (null == member) {
             throw new CustomException(ErrorCode.NOT_FOUND_MEMBER);
         }
 
-        if(!member.validatePassword(passwordEncoder,testDto.getPw())){
+        if(!member.validatePassword(passwordEncoder,loginReqDto.getPw())){
             throw new CustomException(ErrorCode.WRONG_PASSWORD);
         }
 

@@ -42,7 +42,7 @@ public class MemberController {
     //로그인한상태에서 탈퇴 가능 userid,pw 필요
     //게시물과 참가신청을 하지 않은사람만 탈퇴 가능
     @DeleteMapping("/byemember")
-    public GlobalResDto<?> deleMember(@AuthenticationPrincipal UserDetailsImpl userDetails,@RequestBody TestDto testDto){
-        return memberService.deleMember(userDetails,testDto);
+    public GlobalResDto<?> deleMember(@AuthenticationPrincipal UserDetailsImpl userDetails,@RequestBody LoginReqDto loginReqDto){
+        return memberService.deleMember(userDetails,loginReqDto);
     }
 }
