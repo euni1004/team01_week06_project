@@ -18,7 +18,9 @@ public enum ErrorCode {
 
     RECRUITSTATUS_ALREADY(HttpStatus.BAD_REQUEST.value(), "R001","참가신청은 한번만 가능합니다."),
     RECRUITSTATUS_NOT_FOUND(HttpStatus.BAD_REQUEST.value(), "R002","참가신청한 이력이 없습니다."),
-    NOT_RECRUIT_MYPOST(HttpStatus.BAD_REQUEST.value(), "R003","자신의 게시물에는 참가신청이 불가능 합니다.");
+    NOT_RECRUIT_MYPOST(HttpStatus.BAD_REQUEST.value(), "R003","자신의 게시물에는 참가신청이 불가능 합니다."),
+
+    FILE_SIZE_ERROR(HttpStatus.BAD_REQUEST.value(), "F001","파일사이즈의 최대사이즈는 256KB입니다");
 
 
     private final int httpStatus;

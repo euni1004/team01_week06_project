@@ -6,6 +6,11 @@ spring:
   profiles:
     include: test
 
+  servlet:
+    multipart:
+      max-file-size: 256KB
+      max-request-size: 256KB
+
   h2:
     console:
       enabled: true
@@ -16,11 +21,6 @@ spring:
         format_sql: true
     hibernate:
       ddl-auto: update
-
-  http:
-    multipart:
-      max-file-size: 256KB
-      max-request-size: 256KB
 
 #    database-platform: org.hibernate.dialect.H2Dialect
 #    hibernate:
