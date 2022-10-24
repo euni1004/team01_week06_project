@@ -10,34 +10,37 @@ import java.util.List;
 @AllArgsConstructor
 public class GamePostResDto {
 
+    private String postTime;
     private Long gamePostId;
     private String gameName;
     private String content;
     private List<String> inGameNickname;
     private int numberOfPeople;
     private boolean recruitStatus;
-    private String imgurl;
+    private String imgUrl;
 
-    public static GamePostResDto toDoneGamePostResDto(GamePost gamePost, List<String> inGameNickname,String imgurl) {
+    public static GamePostResDto toDoneGamePostResDto(String postTime, GamePost gamePost, List<String> inGameNickname, String imgUrl) {
         return new GamePostResDto(
+                postTime,
                 gamePost.getGamePostId(),
                 gamePost.getGameName(),
                 gamePost.getContent(),
                 inGameNickname,
                 gamePost.getNumberOfPeople(),
                 gamePost.getRecruitStatus(),
-                imgurl);
+                imgUrl);
     }
 
-    public static GamePostResDto toGamePostResDto(GamePost gamePost, String imgurl) {
+    public static GamePostResDto toGamePostResDto(String postTime, GamePost gamePost, String imgUrl) {
         return new GamePostResDto(
+                postTime,
                 gamePost.getGamePostId(),
                 gamePost.getGameName(),
                 gamePost.getContent(),
                 null,
                 gamePost.getNumberOfPeople(),
                 gamePost.getRecruitStatus(),
-                imgurl
+                imgUrl
         );
     }
 }

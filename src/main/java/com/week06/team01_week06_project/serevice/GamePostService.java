@@ -6,7 +6,6 @@ import com.week06.team01_week06_project.domain.RecruitStatus;
 import com.week06.team01_week06_project.dto.GlobalResDto;
 import com.week06.team01_week06_project.dto.request.GamepostReqDto;
 import com.week06.team01_week06_project.dto.request.PutGamepostReqDto;
-import com.week06.team01_week06_project.dto.request.RecruitMemberDto;
 import com.week06.team01_week06_project.dto.response.GamePostResDto;
 import com.week06.team01_week06_project.exception.CustomException;
 import com.week06.team01_week06_project.exception.ErrorCode;
@@ -19,9 +18,9 @@ import com.week06.team01_week06_project.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StopWatch;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -101,23 +100,25 @@ public class GamePostService {
         List<GamePostResDto> gamePostResDtos = new ArrayList<>();
 
         for (GamePost gamePost : gamePosts) {
+            String postTime = gamePost.getCreatedAt().format(DateTimeFormatter.ofPattern("M월 d일 h시 m분"));
             String imgUrl = amazonS3ResourceStorage.getimg(gamePost.getPath());
-            GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(gamePost, imgUrl);
+            GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(postTime,gamePost, imgUrl);
             gamePostResDtos.add(gamePostResDto);
         }
         return GlobalResDto.success(gamePostResDtos);
     }
 
     public GlobalResDto<List<GamePostResDto>> getAllGamePostFalse() {
-        List<GamePost> gamePosts = gamePostRepository.findAllByRecruitStatus(true);
+        List<GamePost> gamePosts = gamePostRepository.findAllByRecruitStatus(false);
 
         //원하는 dto로 바뀌기 위해 list
         List<GamePostResDto> gamePostResDtos = new ArrayList<>();
         for (GamePost gamePost : gamePosts) {
+            String postTime = gamePost.getCreatedAt().format(DateTimeFormatter.ofPattern("M월 d일 h시 m분"));
             String imgUrl = amazonS3ResourceStorage.getimg(gamePost.getPath());
             List<String> inGameNickname = isPresentNickname(gamePost);
             inGameNickname.add(0, gamePost.getMyIngameNickname());
-            GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(gamePost, inGameNickname, imgUrl);
+            GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(postTime,gamePost, inGameNickname, imgUrl);
             gamePostResDtos.add(gamePostResDto);
         }
         return GlobalResDto.success(gamePostResDtos);
@@ -128,14 +129,15 @@ public class GamePostService {
         if (gamePost == null) {
             throw new CustomException(ErrorCode.NOT_FOUND_GAMEPOST);
         }
+        String postTime = gamePost.getCreatedAt().format(DateTimeFormatter.ofPattern("M월 d일 h시 m분"));
         String imgUrl = amazonS3ResourceStorage.getimg(gamePost.getPath());
         if (gamePost.getRecruitStatus()) {
-            GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(gamePost, imgUrl);
+            GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(postTime,gamePost, imgUrl);
             return GlobalResDto.success(gamePostResDto);
         } else {
             List<String> inGameNickname = isPresentNickname(gamePost);
             inGameNickname.add(0, gamePost.getMyIngameNickname());
-            GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(gamePost, inGameNickname, imgUrl);
+            GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(postTime,gamePost, inGameNickname, imgUrl);
             return GlobalResDto.success(gamePostResDto);
         }
     }
