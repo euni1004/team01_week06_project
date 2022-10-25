@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.text.ParseException;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,7 +33,7 @@ public class GamePostController {
     @PutMapping("/gamepost/{gamepostid}")
     public GlobalResDto<?> putGamePost(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                        @RequestBody PutGamepostReqDto putGamepostReqDto,
-                                       @PathVariable Long gamepostid) {
+                                       @PathVariable Long gamepostid) throws ParseException {
         return gamePostService.putGamePost(userDetails, putGamepostReqDto, gamepostid);
     }
 
@@ -44,18 +45,18 @@ public class GamePostController {
 
     //모든 게임 모집글
     @GetMapping("/showpost/recruittrue")
-    public GlobalResDto<?> getAllGamePostTrue() {
+    public GlobalResDto<?> getAllGamePostTrue() throws ParseException {
         return gamePostService.getAllGamePostTrue();
     }
 
     @GetMapping("/showpost/recruitfalse")
-    public GlobalResDto<?> getAllGamePostFalse() {
+    public GlobalResDto<?> getAllGamePostFalse() throws ParseException{
         return gamePostService.getAllGamePostFalse();
     }
 
     //모집글 1개
     @GetMapping("/showpost/{gamepostid}")
-    public GlobalResDto<?> getGamePost(@PathVariable Long gamepostid) {
+    public GlobalResDto<?> getGamePost(@PathVariable Long gamepostid) throws ParseException{
         return gamePostService.getGamePost(gamepostid);
     }
 

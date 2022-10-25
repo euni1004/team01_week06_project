@@ -20,8 +20,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,7 +52,7 @@ public class GamePostService {
         int num = amazonS3ResourceStorage.store(path, multipartFile);
 
         if (num == 0) {
-            path = "/images/normal_game.jpg";
+            path = "images/normal.jpg";
         }
 
         GamePost gamePost = new GamePost(member, gamepostReqDto, path);
@@ -58,7 +62,7 @@ public class GamePostService {
 
     //모집글 수정하는 곳
     @Transactional
-    public GlobalResDto<GamePostResDto> putGamePost(UserDetailsImpl userDetails, PutGamepostReqDto putGamepostReqDto, Long gamePostId) {
+    public GlobalResDto<GamePostResDto> putGamePost(UserDetailsImpl userDetails, PutGamepostReqDto putGamepostReqDto, Long gamePostId) throws ParseException {
 
         GamePost gamePost = isPresentGamePost(gamePostId);
         if (gamePost == null) {
@@ -84,7 +88,7 @@ public class GamePostService {
             throw new CustomException(ErrorCode.NO_PERMISSION_DELETE);
         }
 
-        if (!gamePost.getPath().equals("/images/normal_game.jpg")) {
+        if (!gamePost.getPath().equals("images/normal.jpg")) {
             amazonS3ResourceStorage.delimg(gamePost.getPath());
         }
 
@@ -93,51 +97,54 @@ public class GamePostService {
         return GlobalResDto.success(null);
     }
 
-    public GlobalResDto<List<GamePostResDto>> getAllGamePostTrue() {
+    public GlobalResDto<List<GamePostResDto>> getAllGamePostTrue() throws ParseException {
         List<GamePost> gamePosts = gamePostRepository.findAllByRecruitStatus(true);
 
         //원하는 dto로 바뀌기 위해 list
         List<GamePostResDto> gamePostResDtos = new ArrayList<>();
 
         for (GamePost gamePost : gamePosts) {
+            String countTime = countDate(gamePost.getCreatedAt());
             String postTime = gamePost.getCreatedAt().format(DateTimeFormatter.ofPattern("M월 d일 h시 m분"));
             String imgUrl = amazonS3ResourceStorage.getimg(gamePost.getPath());
-            GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(postTime,gamePost, imgUrl);
-            gamePostResDtos.add(gamePostResDto);
+            GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(postTime, countTime, gamePost, imgUrl);
+            gamePostResDtos.add(0, gamePostResDto);
         }
         return GlobalResDto.success(gamePostResDtos);
     }
 
-    public GlobalResDto<List<GamePostResDto>> getAllGamePostFalse() {
+    public GlobalResDto<List<GamePostResDto>> getAllGamePostFalse() throws ParseException {
         List<GamePost> gamePosts = gamePostRepository.findAllByRecruitStatus(false);
 
         //원하는 dto로 바뀌기 위해 list
         List<GamePostResDto> gamePostResDtos = new ArrayList<>();
         for (GamePost gamePost : gamePosts) {
+            String countTime = countDate(gamePost.getCreatedAt());
             String postTime = gamePost.getCreatedAt().format(DateTimeFormatter.ofPattern("M월 d일 h시 m분"));
             String imgUrl = amazonS3ResourceStorage.getimg(gamePost.getPath());
             List<String> inGameNickname = isPresentNickname(gamePost);
             inGameNickname.add(0, gamePost.getMyIngameNickname());
-            GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(postTime,gamePost, inGameNickname, imgUrl);
-            gamePostResDtos.add(gamePostResDto);
+            GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(postTime, countTime, gamePost, inGameNickname, imgUrl);
+            gamePostResDtos.add(0, gamePostResDto);
         }
         return GlobalResDto.success(gamePostResDtos);
     }
 
-    public GlobalResDto<GamePostResDto> getGamePost(Long gamePostId) {
+    public GlobalResDto<GamePostResDto> getGamePost(Long gamePostId) throws ParseException {
         GamePost gamePost = isPresentGamePost(gamePostId);
         if (gamePost == null) {
             throw new CustomException(ErrorCode.NOT_FOUND_GAMEPOST);
         }
+        String countTime = countDate(gamePost.getCreatedAt());
         String postTime = gamePost.getCreatedAt().format(DateTimeFormatter.ofPattern("M월 d일 h시 m분"));
         String imgUrl = amazonS3ResourceStorage.getimg(gamePost.getPath());
         if (gamePost.getRecruitStatus()) {
-            GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(postTime,gamePost, imgUrl);
+            GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(postTime, countTime, gamePost, imgUrl);
             return GlobalResDto.success(gamePostResDto);
         } else {
             List<String> inGameNickname = isPresentNickname(gamePost);
             inGameNickname.add(0, gamePost.getMyIngameNickname());
-            GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(postTime,gamePost, inGameNickname, imgUrl);
+            GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(postTime, countTime, gamePost, inGameNickname, imgUrl);
             return GlobalResDto.success(gamePostResDto);
         }
     }
@@ -160,6 +167,35 @@ public class GamePostService {
             inGameNickName.add(recruitStatus.getInGameNickname());
         }
         return inGameNickName;
+    }
+
+    public String countDate(LocalDateTime localDateTime) throws ParseException {
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYYMMddHHmm");
+        String nowTime = simpleDateFormat.format(date);
+        Date nowDate = simpleDateFormat.parse(nowTime);
+        long now = nowDate.getTime();
+
+        String postTime = localDateTime.format(DateTimeFormatter.ofPattern("YYYYMMddHHmm"));
+        Date postDate = simpleDateFormat.parse(postTime);
+        long post = postDate.getTime();
+
+        long time = (now - post) / 60000;
+        String countTime = "";
+
+        if(time<=1){
+            countTime = "1분 전";
+        } else if (time < 10) {
+            countTime = time+"분 전";
+        }else if(time<60){
+            countTime = (time/10)+"0분 전";
+        }else if(time< 720){
+            countTime = (time/60)+"시간 전";
+        }else{
+            countTime = localDateTime.format(DateTimeFormatter.ofPattern("MM월 dd일 HH시 mm분"));
+        }
+
+        return countTime;
     }
 
 

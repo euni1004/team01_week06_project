@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 
+
 @RestControllerAdvice
 public class ExceptionHandling {
 
@@ -29,5 +30,10 @@ public class ExceptionHandling {
                 .getDefaultMessage();
 
         return ResponseEntity.badRequest().body(errorMessage);
+    }
+
+    @ExceptionHandler(value = { RuntimeException.class })
+    public Object runTimeException(RuntimeException e){
+        return new Error(404,"A001",e.getMessage());
     }
 }

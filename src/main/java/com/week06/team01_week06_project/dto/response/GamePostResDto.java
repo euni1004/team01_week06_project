@@ -11,6 +11,7 @@ import java.util.List;
 public class GamePostResDto {
 
     private String postTime;
+    private String countTime;
     private Long gamePostId;
     private String gameName;
     private String content;
@@ -19,9 +20,10 @@ public class GamePostResDto {
     private boolean recruitStatus;
     private String imgUrl;
 
-    public static GamePostResDto toDoneGamePostResDto(String postTime, GamePost gamePost, List<String> inGameNickname, String imgUrl) {
+    public static GamePostResDto toDoneGamePostResDto(String postTime, String  countTime,GamePost gamePost, List<String> inGameNickname, String imgUrl) {
         return new GamePostResDto(
                 postTime,
+                countTime,
                 gamePost.getGamePostId(),
                 gamePost.getGameName(),
                 gamePost.getContent(),
@@ -31,9 +33,10 @@ public class GamePostResDto {
                 imgUrl);
     }
 
-    public static GamePostResDto toGamePostResDto(String postTime, GamePost gamePost, String imgUrl) {
+    public static GamePostResDto toGamePostResDto(String postTime, String  countTime,GamePost gamePost, String imgUrl) {
         return new GamePostResDto(
                 postTime,
+                countTime,
                 gamePost.getGamePostId(),
                 gamePost.getGameName(),
                 gamePost.getContent(),
