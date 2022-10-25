@@ -8,6 +8,7 @@ import com.week06.team01_week06_project.dto.response.GamePostResDto;
 import com.week06.team01_week06_project.exception.CustomException;
 import com.week06.team01_week06_project.exception.ErrorCode;
 import com.week06.team01_week06_project.respository.MemberRepository;
+import com.week06.team01_week06_project.s3.AmazonS3ResourceStorage;
 import com.week06.team01_week06_project.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MyPageService {
     private final MemberRepository memberRepository;
+    private final AmazonS3ResourceStorage amazonS3ResourceStorage;
+    private final GamePostService gamePostService;
 
     public GlobalResDto<List<GamePostResDto>> getMyPost(UserDetailsImpl userDetails){
         Member member = memberRepository.findByUserid(userDetails.getAccount().getUserid()).orElseThrow(
@@ -27,7 +30,14 @@ public class MyPageService {
         List<GamePost> myGamePosts = member.getGamePost();
         List<GamePostResDto> myGamePostList = new ArrayList<>();
         for(GamePost gamePost : myGamePosts){
-            myGamePostList.add(GamePostResDto.myPost(gamePost));
+            String imgurl = amazonS3ResourceStorage.getimg(gamePost.getPath());
+            if (gamePost.getRecruitStatus()){
+                myGamePostList.add(GamePostResDto.toGamePostResDto(gamePost,imgurl));
+            } else {
+                List<String> inGameNickname = gamePostService.isPresentNickname(gamePost);
+                inGameNickname.add(0, gamePost.getMyIngameNickname());
+                myGamePostList.add(GamePostResDto.toDoneGamePostResDto(gamePost,inGameNickname,imgurl));
+            }
         }
         return GlobalResDto.success(myGamePostList);
     }
@@ -38,8 +48,15 @@ public class MyPageService {
         );
         List<RecruitStatus> myRecruit = member.getRecruitStatus();
         List<GamePostResDto> myGameRecruitList = new ArrayList<>();
-        for(RecruitStatus gamePost : myRecruit){
-            myGameRecruitList.add(GamePostResDto.myPost(gamePost.getGamePost()));
+        for(RecruitStatus recruit : myRecruit){
+            String imgurl = amazonS3ResourceStorage.getimg(recruit.getGamePost().getPath());
+            if (recruit.getGamePost().getRecruitStatus()){
+                myGameRecruitList.add(GamePostResDto.toGamePostResDto(recruit.getGamePost(),imgurl));
+            } else {
+                List<String> inGameNickname = gamePostService.isPresentNickname(recruit.getGamePost());
+                inGameNickname.add(0, recruit.getGamePost().getMyIngameNickname());
+                myGameRecruitList.add(GamePostResDto.toDoneGamePostResDto(recruit.getGamePost(),inGameNickname,imgurl));
+            }
         }
         return GlobalResDto.success(myGameRecruitList);
     }

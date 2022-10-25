@@ -18,18 +18,6 @@ public class GamePostResDto {
     private boolean recruitStatus;
     private String imgurl;
 
-    public static GamePostResDto myPost(GamePost gamePost) {
-        return new GamePostResDto(
-                gamePost.getGamePostId(),
-                gamePost.getGameName(),
-                gamePost.getContent(),
-                null,
-                gamePost.getNumberOfPeople(),
-                gamePost.getRecruitStatus(),
-                gamePost.getPath()
-                );
-    }
-
     public static GamePostResDto toDoneGamePostResDto(GamePost gamePost, List<String> inGameNickname,String imgurl) {
         return new GamePostResDto(
                 gamePost.getGamePostId(),
