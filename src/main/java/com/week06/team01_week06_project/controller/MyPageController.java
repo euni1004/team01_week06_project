@@ -10,6 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.ParseException;
 import java.util.List;
 
 @RestController
@@ -18,12 +19,12 @@ public class MyPageController {
     private final MyPageService myPageService;
 
     @GetMapping("/myPost")
-    public GlobalResDto<?> getMyPost(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public GlobalResDto<?> getMyPost(@AuthenticationPrincipal UserDetailsImpl userDetails) throws ParseException {
         return myPageService.getMyPost(userDetails);
     }
 
     @GetMapping("/myRecruit")
-    public GlobalResDto<?> getMyRecruit(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public GlobalResDto<?> getMyRecruit(@AuthenticationPrincipal UserDetailsImpl userDetails) throws ParseException {
         return myPageService.getMyRecruit(userDetails);
     }
 }
