@@ -47,6 +47,10 @@ public class GamePostService {
             throw new CustomException(ErrorCode.NOT_FOUND_MEMBER);
         }
 
+        if(gamepostReqDto.getNumberOfPeople()<1 && gamepostReqDto.getNumberOfPeople()>100){
+            throw new CustomException(ErrorCode.NUMBER_OF_PEOPLE_ERROR);
+        }
+
         String path = MultipartUtil.createPath(MultipartUtil.createFileId(), MultipartUtil.getFormat(multipartFile.getContentType()));
 
         int num = amazonS3ResourceStorage.store(path, multipartFile);
@@ -104,10 +108,11 @@ public class GamePostService {
         List<GamePostResDto> gamePostResDtos = new ArrayList<>();
 
         for (GamePost gamePost : gamePosts) {
+            Long numberOfRecruited = recruitStatusRepository.countByGamePost(gamePost);
             String countTime = countDate(gamePost.getCreatedAt());
             String postTime = gamePost.getCreatedAt().format(DateTimeFormatter.ofPattern("M월 d일 h시 m분"));
             String imgUrl = amazonS3ResourceStorage.getimg(gamePost.getPath());
-            GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(postTime, countTime, gamePost, imgUrl);
+            GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(postTime, countTime, gamePost, numberOfRecruited, imgUrl);
             gamePostResDtos.add(0, gamePostResDto);
         }
         return GlobalResDto.success(gamePostResDtos);
@@ -124,7 +129,7 @@ public class GamePostService {
             String imgUrl = amazonS3ResourceStorage.getimg(gamePost.getPath());
             List<String> inGameNickname = isPresentNickname(gamePost);
             inGameNickname.add(0, gamePost.getMyIngameNickname());
-            GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(postTime, countTime, gamePost, inGameNickname, imgUrl);
+            GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(postTime, countTime, gamePost, inGameNickname, (long) gamePost.getNumberOfPeople(), imgUrl);
             gamePostResDtos.add(0, gamePostResDto);
         }
         return GlobalResDto.success(gamePostResDtos);
@@ -135,16 +140,17 @@ public class GamePostService {
         if (gamePost == null) {
             throw new CustomException(ErrorCode.NOT_FOUND_GAMEPOST);
         }
+        Long numberOfRecruited = recruitStatusRepository.countByGamePost(gamePost);
         String countTime = countDate(gamePost.getCreatedAt());
         String postTime = gamePost.getCreatedAt().format(DateTimeFormatter.ofPattern("M월 d일 h시 m분"));
         String imgUrl = amazonS3ResourceStorage.getimg(gamePost.getPath());
         if (gamePost.getRecruitStatus()) {
-            GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(postTime, countTime, gamePost, imgUrl);
+            GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(postTime, countTime, gamePost, numberOfRecruited, imgUrl);
             return GlobalResDto.success(gamePostResDto);
         } else {
             List<String> inGameNickname = isPresentNickname(gamePost);
             inGameNickname.add(0, gamePost.getMyIngameNickname());
-            GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(postTime, countTime, gamePost, inGameNickname, imgUrl);
+            GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(postTime, countTime, gamePost, inGameNickname, numberOfRecruited, imgUrl);
             return GlobalResDto.success(gamePostResDto);
         }
     }
@@ -183,15 +189,15 @@ public class GamePostService {
         long time = (now - post) / 60000;
         String countTime = "";
 
-        if(time<=1){
+        if (time <= 1) {
             countTime = "1분 전";
         } else if (time < 10) {
-            countTime = time+"분 전";
-        }else if(time<60){
-            countTime = (time/10)+"0분 전";
-        }else if(time< 720){
-            countTime = (time/60)+"시간 전";
-        }else{
+            countTime = time + "분 전";
+        } else if (time < 60) {
+            countTime = (time / 10) + "0분 전";
+        } else if (time < 720) {
+            countTime = (time / 60) + "시간 전";
+        } else {
             countTime = localDateTime.format(DateTimeFormatter.ofPattern("MM월 dd일 HH시 mm분"));
         }
 
@@ -200,22 +206,23 @@ public class GamePostService {
 
     public GlobalResDto<?> searchPost(String searchKeyword) throws ParseException {
 
-        List<GamePost> gamePosts = gamePostRepository.findAllByGameNameContaining (searchKeyword);
+        List<GamePost> gamePosts = gamePostRepository.findAllByGameNameContaining(searchKeyword);
 
         //원하는 dto로 바뀌기 위해 list
         List<GamePostResDto> gamePostResDtos = new ArrayList<>();
 
         for (GamePost gamePost : gamePosts) {
+            Long numberOfRecruited = recruitStatusRepository.countByGamePost(gamePost);
             String countTime = countDate(gamePost.getCreatedAt());
             String postTime = gamePost.getCreatedAt().format(DateTimeFormatter.ofPattern("M월 d일 h시 m분"));
             String imgurl = amazonS3ResourceStorage.getimg(gamePost.getPath());
             if (gamePost.getRecruitStatus()) {
-                GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(postTime, countTime,gamePost,imgurl);
+                GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(postTime, countTime, gamePost, numberOfRecruited, imgurl);
                 gamePostResDtos.add(gamePostResDto);
             } else {
                 List<String> inGameNickname = isPresentNickname(gamePost);
                 inGameNickname.add(0, gamePost.getMyIngameNickname());
-                GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(postTime, countTime,gamePost, inGameNickname,imgurl);
+                GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(postTime, countTime, gamePost, inGameNickname, numberOfRecruited, imgurl);
                 gamePostResDtos.add(gamePostResDto);
             }
         }

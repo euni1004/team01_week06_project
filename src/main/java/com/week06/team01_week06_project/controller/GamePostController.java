@@ -23,8 +23,8 @@ public class GamePostController {
     //게임모집글 작성
     @PostMapping("/gamepost")
     public GlobalResDto<?> generateGamePost(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                            @RequestPart(value = "json") GamepostReqDto gamepostReqDto,
-                                            @Valid @RequestPart("file") MultipartFile multipartFile) {
+                                            @RequestPart("json") GamepostReqDto gamepostReqDto,
+                                            @RequestPart("file") MultipartFile multipartFile) {
         Long memberid = userDetails.getAccount().getMemberId();
         return gamePostService.generateGamePost(memberid, gamepostReqDto, multipartFile);
     }

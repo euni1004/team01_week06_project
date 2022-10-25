@@ -17,10 +17,11 @@ public class GamePostResDto {
     private String content;
     private List<String> inGameNickname;
     private int numberOfPeople;
+    private Long numberOdRecruited;
     private boolean recruitStatus;
     private String imgUrl;
 
-    public static GamePostResDto toDoneGamePostResDto(String postTime, String  countTime,GamePost gamePost, List<String> inGameNickname, String imgUrl) {
+    public static GamePostResDto toDoneGamePostResDto(String postTime, String  countTime,GamePost gamePost, List<String> inGameNickname,Long  numberOdRecruited,String imgUrl) {
         return new GamePostResDto(
                 postTime,
                 countTime,
@@ -29,11 +30,12 @@ public class GamePostResDto {
                 gamePost.getContent(),
                 inGameNickname,
                 gamePost.getNumberOfPeople(),
+                numberOdRecruited,
                 gamePost.getRecruitStatus(),
                 imgUrl);
     }
 
-    public static GamePostResDto toGamePostResDto(String postTime, String  countTime,GamePost gamePost, String imgUrl) {
+    public static GamePostResDto toGamePostResDto(String postTime, String  countTime,GamePost gamePost,Long  numberOdRecruited, String imgUrl) {
         return new GamePostResDto(
                 postTime,
                 countTime,
@@ -42,6 +44,7 @@ public class GamePostResDto {
                 gamePost.getContent(),
                 null,
                 gamePost.getNumberOfPeople(),
+                numberOdRecruited,
                 gamePost.getRecruitStatus(),
                 imgUrl
         );

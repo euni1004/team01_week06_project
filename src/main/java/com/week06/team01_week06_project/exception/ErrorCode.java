@@ -15,6 +15,7 @@ public enum ErrorCode {
     NOT_FOUND_GAMEPOST(HttpStatus.NOT_FOUND.value(),"P001","게시물이 존재하지 않습니다."),
     NO_PERMISSION_CHANGE(HttpStatus.UNAUTHORIZED.value(), "P002","자신이 작성한 게시물만 수정가능합니다."),
     NO_PERMISSION_DELETE(HttpStatus.UNAUTHORIZED.value(), "P003","자신이 작성한 게시물만 삭제가능합니다."),
+    NUMBER_OF_PEOPLE_ERROR(HttpStatus.BAD_REQUEST.value(),"P004","모집인원은 1명이상 100이하입니다."),
 
     RECRUITSTATUS_ALREADY(HttpStatus.BAD_REQUEST.value(), "R001","참가신청은 한번만 가능합니다."),
     RECRUITSTATUS_NOT_FOUND(HttpStatus.BAD_REQUEST.value(), "R002","참가신청한 이력이 없습니다."),
