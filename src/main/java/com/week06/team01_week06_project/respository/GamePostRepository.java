@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface GamePostRepository extends JpaRepository<GamePost,Long> {
     List<GamePost> findAllByRecruitStatus(Boolean status);
+    List<GamePost> findAllByGameNameContaining(String gameName);
 }

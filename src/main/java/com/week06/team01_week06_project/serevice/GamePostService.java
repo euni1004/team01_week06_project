@@ -198,6 +198,29 @@ public class GamePostService {
         return countTime;
     }
 
+    public GlobalResDto<?> searchPost(String searchKeyword) {
+
+        List<GamePost> gamePosts = gamePostRepository.findAllByGameNameContaining (searchKeyword);
+
+        //원하는 dto로 바뀌기 위해 list
+        List<GamePostResDto> gamePostResDtos = new ArrayList<>();
+
+        for (GamePost gamePost : gamePosts) {
+            String imgurl = amazonS3ResourceStorage.getimg(gamePost.getPath());
+            if (gamePost.getRecruitStatus()) {
+                GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(gamePost,imgurl);
+                gamePostResDtos.add(gamePostResDto);
+            } else {
+                List<String> inGameNickname = isPresentNickname(gamePost);
+                inGameNickname.add(0, gamePost.getMyIngameNickname());
+                GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(gamePost, inGameNickname,imgurl);
+                gamePostResDtos.add(gamePostResDto);
+            }
+        }
+        return GlobalResDto.success(gamePostResDtos);
+
+    }
+
 
 //    public GlobalResDto<GamePost> checkValidation(Long gamepostid, UserDetailsImpl userDetails){
 //        GamePost gamePost = isPresentGamePost(gamepostid);
