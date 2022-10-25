@@ -151,14 +151,26 @@ public class GamePostService {
     }
 
     public GlobalResDto<?> searchPost(String searchKeyword) {
-        if(searchKeyword == null) {
-            return GlobalResDto.fail ( "DATA_NOT_FOUND", "글자를 입력해주세요" );
+
+        List<GamePost> gamePosts = gamePostRepository.findAllByGameNameContaining (searchKeyword);
+
+        //원하는 dto로 바뀌기 위해 list
+        List<GamePostResDto> gamePostResDtos = new ArrayList<>();
+
+        for (GamePost gamePost : gamePosts) {
+            String imgurl = amazonS3ResourceStorage.getimg(gamePost.getPath());
+            if (gamePost.getRecruitStatus()) {
+                GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(gamePost,imgurl);
+                gamePostResDtos.add(gamePostResDto);
+            } else {
+                List<String> inGameNickname = isPresentNickname(gamePost);
+                inGameNickname.add(0, gamePost.getMyIngameNickname());
+                GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(gamePost, inGameNickname,imgurl);
+                gamePostResDtos.add(gamePostResDto);
+            }
         }
-        List<GamePost> findGamePosts = gamePostRepository.findAllByGameNameContaining ( searchKeyword );
-        if(findGamePosts == null) {
-            return GlobalResDto.fail ( "SEARCH_NOT_FOUND", "게시글을 찾을 수 없습니다." );
-        }
-        return GlobalResDto.success ( findGamePosts );
+        return GlobalResDto.success(gamePostResDtos);
+
     }
 
 

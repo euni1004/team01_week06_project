@@ -39,7 +39,7 @@ Content-Type: application/json
 ###모집글작성1
 POST http://localhost:8080/api/gamepost
 Content-Type: application/json
-Access_Token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJrZWg1MTY0MSIsImV4cCI6MTY2NjQwODMzNSwiaWF0IjoxNjY2NDA2NTM1fQ.aY3pre0pS7q4xjXr7FMe_04b6E8Gg7WvxyQAoidVQzU
+Access_Token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJrZWg1MTY0MSIsImV4cCI6MTY2NjYzMTY2NywiaWF0IjoxNjY2NjI5ODY3fQ.UjNc5mrhMSRWXckZHfLpFlds4dmCRTgjq2YanF8wG_c
 
 {
   "gameName": "오버워치",
