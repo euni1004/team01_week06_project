@@ -198,7 +198,7 @@ public class GamePostService {
         return countTime;
     }
 
-    public GlobalResDto<?> searchPost(String searchKeyword) {
+    public GlobalResDto<?> searchPost(String searchKeyword) throws ParseException {
 
         List<GamePost> gamePosts = gamePostRepository.findAllByGameNameContaining (searchKeyword);
 
@@ -206,14 +206,16 @@ public class GamePostService {
         List<GamePostResDto> gamePostResDtos = new ArrayList<>();
 
         for (GamePost gamePost : gamePosts) {
+            String countTime = countDate(gamePost.getCreatedAt());
+            String postTime = gamePost.getCreatedAt().format(DateTimeFormatter.ofPattern("M월 d일 h시 m분"));
             String imgurl = amazonS3ResourceStorage.getimg(gamePost.getPath());
             if (gamePost.getRecruitStatus()) {
-                GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(gamePost,imgurl);
+                GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(postTime, countTime,gamePost,imgurl);
                 gamePostResDtos.add(gamePostResDto);
             } else {
                 List<String> inGameNickname = isPresentNickname(gamePost);
                 inGameNickname.add(0, gamePost.getMyIngameNickname());
-                GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(gamePost, inGameNickname,imgurl);
+                GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(postTime, countTime,gamePost, inGameNickname,imgurl);
                 gamePostResDtos.add(gamePostResDto);
             }
         }

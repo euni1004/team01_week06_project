@@ -61,7 +61,7 @@ public class GamePostController {
     }
 
     @GetMapping("/showpost/search")
-    public GlobalResDto<?> searchPost(@RequestParam(name = "gameName") String gameName) {
+    public GlobalResDto<?> searchPost(@RequestParam(name = "gameName") String gameName) throws ParseException {
         return gamePostService.searchPost(gameName);
     }
 
