@@ -1,5 +1,6 @@
 package com.week06.team01_week06_project.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.week06.team01_week06_project.dto.request.GamepostReqDto;
 import com.week06.team01_week06_project.dto.request.PutGamepostReqDto;
 import lombok.AllArgsConstructor;
@@ -24,6 +25,7 @@ public class GamePost extends Timestamped{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberid")
+    @JsonIgnore
     private Member member;
 
     @Column(nullable = false)
