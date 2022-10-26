@@ -48,15 +48,14 @@ public class GamePostService {
             throw new CustomException(ErrorCode.NUMBER_OF_PEOPLE_ERROR);
         }
 
-        String path = "";
+        String path;
 
         if (multipartFile.isEmpty()) {
             path = "images/normal.jpg";
         }else {
             path = MultipartUtil.createPath(MultipartUtil.createFileId(), MultipartUtil.getFormat(multipartFile.getContentType()));
+            amazonS3ResourceStorage.store(path, multipartFile);
         }
-
-        amazonS3ResourceStorage.store(path, multipartFile);
 
         GamePost gamePost = new GamePost(member, gamepostReqDto, path);
         gamePostRepository.save(gamePost);
