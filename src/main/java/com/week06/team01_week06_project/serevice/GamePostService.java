@@ -20,12 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,7 +44,7 @@ public class GamePostService {
             throw new CustomException(ErrorCode.NOT_FOUND_MEMBER);
         }
 
-        if(gamepostReqDto.getNumberOfPeople()<1 && gamepostReqDto.getNumberOfPeople()>100){
+        if(gamepostReqDto.getNumberOfPeople()<1 || gamepostReqDto.getNumberOfPeople()>100){
             throw new CustomException(ErrorCode.NUMBER_OF_PEOPLE_ERROR);
         }
 
@@ -66,7 +63,7 @@ public class GamePostService {
 
     //모집글 수정하는 곳
     @Transactional
-    public GlobalResDto<GamePostResDto> putGamePost(UserDetailsImpl userDetails, PutGamepostReqDto putGamepostReqDto, Long gamePostId) throws ParseException {
+    public GlobalResDto<GamePostResDto> putGamePost(UserDetailsImpl userDetails, PutGamepostReqDto putGamepostReqDto, Long gamePostId) {
 
         GamePost gamePost = isPresentGamePost(gamePostId);
         if (gamePost == null) {
@@ -96,12 +93,11 @@ public class GamePostService {
             amazonS3ResourceStorage.delimg(gamePost.getPath());
         }
 
-        recruitStatusRepository.deleteAllByGamePost(gamePost);
         gamePostRepository.deleteById(gamePost.getGamePostId());
         return GlobalResDto.success(null);
     }
 
-    public GlobalResDto<List<GamePostResDto>> getAllGamePostTrue() throws ParseException {
+    public GlobalResDto<List<GamePostResDto>> getAllGamePostTrue() {
         List<GamePost> gamePosts = gamePostRepository.findAllByRecruitStatus(true);
 
         //원하는 dto로 바뀌기 위해 list
@@ -118,7 +114,7 @@ public class GamePostService {
         return GlobalResDto.success(gamePostResDtos);
     }
 
-    public GlobalResDto<List<GamePostResDto>> getAllGamePostFalse() throws ParseException {
+    public GlobalResDto<List<GamePostResDto>> getAllGamePostFalse() {
         List<GamePost> gamePosts = gamePostRepository.findAllByRecruitStatus(false);
 
         //원하는 dto로 바뀌기 위해 list
@@ -129,13 +125,13 @@ public class GamePostService {
             String imgUrl = amazonS3ResourceStorage.getimg(gamePost.getPath());
             List<String> inGameNickname = isPresentNickname(gamePost);
             inGameNickname.add(0, gamePost.getMyIngameNickname());
-            GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(postTime, countTime, gamePost, inGameNickname, (long) gamePost.getNumberOfPeople(), imgUrl);
+            GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(postTime, countTime, gamePost, inGameNickname, gamePost.getNumberOfPeople(), imgUrl);
             gamePostResDtos.add(0, gamePostResDto);
         }
         return GlobalResDto.success(gamePostResDtos);
     }
 
-    public GlobalResDto<GamePostResDto> getGamePost(Long gamePostId) throws ParseException {
+    public GlobalResDto<GamePostResDto> getGamePost(Long gamePostId) {
         GamePost gamePost = isPresentGamePost(gamePostId);
         if (gamePost == null) {
             throw new CustomException(ErrorCode.NOT_FOUND_GAMEPOST);
@@ -175,36 +171,39 @@ public class GamePostService {
         return inGameNickName;
     }
 
-    public String countDate(LocalDateTime localDateTime) throws ParseException {
-        Date date = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYYMMddHHmm");
-        String nowTime = simpleDateFormat.format(date);
-        Date nowDate = simpleDateFormat.parse(nowTime);
-        long now = nowDate.getTime();
-
-        String postTime = localDateTime.format(DateTimeFormatter.ofPattern("YYYYMMddHHmm"));
-        Date postDate = simpleDateFormat.parse(postTime);
-        long post = postDate.getTime();
-
-        long time = (now - post) / 60000;
+    public String countDate(LocalDateTime localDateTime){
         String countTime = "";
 
-        if (time <= 1) {
-            countTime = "1분 전";
-        } else if (time < 10) {
-            countTime = time + "분 전";
-        } else if (time < 60) {
-            countTime = (time / 10) + "0분 전";
-        } else if (time < 720) {
-            countTime = (time / 60) + "시간 전";
-        } else {
+        LocalDateTime now = LocalDateTime.now();//현재날짜 시간
+        LocalDate nowDate = now.toLocalDate();//현재 날짜
+        LocalTime nowTime = now.toLocalTime();//현재 시간
+
+        LocalDate postDate = localDateTime.toLocalDate();//포스팅 날짜
+        LocalTime postTime = localDateTime.toLocalTime();//포스팅 시간
+
+        Period period = Period.between(postDate,nowDate);
+
+        Duration duration = Duration.between(postTime,nowTime);
+        long betweenTime=duration.getSeconds();
+
+        if(period.getDays()<1){
+            if(betweenTime<=60){
+                countTime="1분 전";
+            }else if(betweenTime<=6000){
+                countTime=(betweenTime/60)+"분 전";
+            }else if(betweenTime<=86400){
+                countTime=(betweenTime/360)+"시간 전";
+            }
+        }else if(period.getDays()<7){
+            countTime = period.getDays()+"일 전";
+        }else {
             countTime = localDateTime.format(DateTimeFormatter.ofPattern("MM월 dd일 HH시 mm분"));
         }
 
         return countTime;
     }
 
-    public GlobalResDto<?> searchPost(String searchKeyword) throws ParseException {
+    public GlobalResDto<List<GamePostResDto>> searchPost(String searchKeyword) {
 
         List<GamePost> gamePosts = gamePostRepository.findAllByGameNameContaining(searchKeyword);
 
@@ -229,7 +228,6 @@ public class GamePostService {
         return GlobalResDto.success(gamePostResDtos);
 
     }
-
 
 //    public GlobalResDto<GamePost> checkValidation(Long gamepostid, UserDetailsImpl userDetails){
 //        GamePost gamePost = isPresentGamePost(gamepostid);

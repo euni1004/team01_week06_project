@@ -40,7 +40,7 @@ public class GamePost extends Timestamped{
     private String myIngameNickname;
 
     @Column(nullable = false)
-    private int numberOfPeople;
+    private long numberOfPeople;
 
     @Column(nullable = false)
     private boolean recruitStatus;
@@ -50,7 +50,7 @@ public class GamePost extends Timestamped{
 
     public GamePost(Member member, GamepostReqDto gamepostReqDto,String path) {
         this.member = member;
-        this.gameName = gamepostReqDto.getGameName();
+        this.gameName = gamepostReqDto.getGamename();
         this.content = gamepostReqDto.getContent();
         this.myIngameNickname = gamepostReqDto.getInGameNickname();
         this.numberOfPeople = gamepostReqDto.getNumberOfPeople();

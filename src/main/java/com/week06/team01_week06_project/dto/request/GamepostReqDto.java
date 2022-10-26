@@ -7,8 +7,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class GamepostReqDto {
 
-    private String gameName;
+    private String gamename;
     private String content;
     private String inGameNickname;
-    private int numberOfPeople;
+    private long numberOfPeople;
+
 }

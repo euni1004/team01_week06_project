@@ -16,7 +16,7 @@ public class GamePostResDto {
     private String gameName;
     private String content;
     private List<String> inGameNickname;
-    private int numberOfPeople;
+    private long numberOfPeople;
     private Long numberOdRecruited;
     private boolean recruitStatus;
     private String imgUrl;
