@@ -30,10 +30,10 @@ public class Member extends Timestamped{
     @Column(nullable = false)
     private String pw;
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     List<GamePost> gamePost = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     List<RecruitStatus> recruitStatus = new ArrayList<>();
 
     public Member(MemberReqDto memberReqDto) {

@@ -24,13 +24,12 @@ public class GamePostController {
     @PostMapping(value = "/gamepost", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public GlobalResDto<?> generateGamePost(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                             @RequestParam(required = false) String content,
-                                            @RequestPart(required = false) MultipartFile multipartFile) {
+                                            @RequestPart MultipartFile multipartFile) {
 
         Long memberid = userDetails.getAccount().getMemberId();
 
         Gson gson = new Gson();
         GamepostReqDto gamepostReqDto = gson.fromJson(content,GamepostReqDto.class);
-        log.info("multipartFile:"+multipartFile.getOriginalFilename());
 
         return gamePostService.generateGamePost(memberid, gamepostReqDto, multipartFile);
     }

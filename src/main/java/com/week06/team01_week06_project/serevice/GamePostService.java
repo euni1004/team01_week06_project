@@ -44,17 +44,19 @@ public class GamePostService {
             throw new CustomException(ErrorCode.NOT_FOUND_MEMBER);
         }
 
-        if(gamepostReqDto.getNumberOfPeople()<1 || gamepostReqDto.getNumberOfPeople()>100){
+        if (gamepostReqDto.getNumberOfPeople() < 2 || gamepostReqDto.getNumberOfPeople() > 100) {
             throw new CustomException(ErrorCode.NUMBER_OF_PEOPLE_ERROR);
         }
 
-        String path = MultipartUtil.createPath(MultipartUtil.createFileId(), MultipartUtil.getFormat(multipartFile.getContentType()));
+        String path = "";
 
-        int num = amazonS3ResourceStorage.store(path, multipartFile);
-
-        if (num == 0) {
+        if (multipartFile.isEmpty()) {
             path = "images/normal.jpg";
+        }else {
+            path = MultipartUtil.createPath(MultipartUtil.createFileId(), MultipartUtil.getFormat(multipartFile.getContentType()));
         }
+
+        amazonS3ResourceStorage.store(path, multipartFile);
 
         GamePost gamePost = new GamePost(member, gamepostReqDto, path);
         gamePostRepository.save(gamePost);
@@ -108,7 +110,7 @@ public class GamePostService {
             String countTime = countDate(gamePost.getCreatedAt());
             String postTime = gamePost.getCreatedAt().format(DateTimeFormatter.ofPattern("M월 d일 h시 m분"));
             String imgUrl = amazonS3ResourceStorage.getimg(gamePost.getPath());
-            GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(postTime, countTime, gamePost, numberOfRecruited, imgUrl);
+            GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(postTime, countTime, gamePost, numberOfRecruited + 1, imgUrl);
             gamePostResDtos.add(0, gamePostResDto);
         }
         return GlobalResDto.success(gamePostResDtos);
@@ -141,12 +143,12 @@ public class GamePostService {
         String postTime = gamePost.getCreatedAt().format(DateTimeFormatter.ofPattern("M월 d일 h시 m분"));
         String imgUrl = amazonS3ResourceStorage.getimg(gamePost.getPath());
         if (gamePost.getRecruitStatus()) {
-            GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(postTime, countTime, gamePost, numberOfRecruited, imgUrl);
+            GamePostResDto gamePostResDto = GamePostResDto.toGamePostResDto(postTime, countTime, gamePost, numberOfRecruited + 1, imgUrl);
             return GlobalResDto.success(gamePostResDto);
         } else {
             List<String> inGameNickname = isPresentNickname(gamePost);
             inGameNickname.add(0, gamePost.getMyIngameNickname());
-            GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(postTime, countTime, gamePost, inGameNickname, numberOfRecruited, imgUrl);
+            GamePostResDto gamePostResDto = GamePostResDto.toDoneGamePostResDto(postTime, countTime, gamePost, inGameNickname, gamePost.getNumberOfPeople(), imgUrl);
             return GlobalResDto.success(gamePostResDto);
         }
     }
@@ -171,7 +173,7 @@ public class GamePostService {
         return inGameNickName;
     }
 
-    public String countDate(LocalDateTime localDateTime){
+    public String countDate(LocalDateTime localDateTime) {
         String countTime = "";
 
         LocalDateTime now = LocalDateTime.now();//현재날짜 시간
@@ -181,22 +183,22 @@ public class GamePostService {
         LocalDate postDate = localDateTime.toLocalDate();//포스팅 날짜
         LocalTime postTime = localDateTime.toLocalTime();//포스팅 시간
 
-        Period period = Period.between(postDate,nowDate);
+        Period period = Period.between(postDate, nowDate);
 
-        Duration duration = Duration.between(postTime,nowTime);
-        long betweenTime=duration.getSeconds();
+        Duration duration = Duration.between(postTime, nowTime);
+        long betweenTime = duration.getSeconds();
 
-        if(period.getDays()<1){
-            if(betweenTime<=60){
-                countTime="1분 전";
-            }else if(betweenTime<=6000){
-                countTime=(betweenTime/60)+"분 전";
-            }else if(betweenTime<=86400){
-                countTime=(betweenTime/360)+"시간 전";
+        if (period.getDays() < 1) {
+            if (betweenTime <= 60) {
+                countTime = "1분 전";
+            } else if (betweenTime <= 6000) {
+                countTime = (betweenTime / 60) + "분 전";
+            } else if (betweenTime <= 86400) {
+                countTime = (betweenTime / 360) + "시간 전";
             }
-        }else if(period.getDays()<7){
-            countTime = period.getDays()+"일 전";
-        }else {
+        } else if (period.getDays() < 7) {
+            countTime = period.getDays() + "일 전";
+        } else {
             countTime = localDateTime.format(DateTimeFormatter.ofPattern("MM월 dd일 HH시 mm분"));
         }
 

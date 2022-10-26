@@ -39,11 +39,11 @@ public class MyPageService {
             String postTime = gamePost.getCreatedAt().format(DateTimeFormatter.ofPattern("M월 d일 h시 m분"));
             String imgurl = amazonS3ResourceStorage.getimg(gamePost.getPath());
             if (gamePost.getRecruitStatus()) {
-                myGamePostList.add(0, GamePostResDto.toGamePostResDto(postTime, countTime, gamePost, numberOfRecruited, imgurl));
+                myGamePostList.add(0, GamePostResDto.toGamePostResDto(postTime, countTime, gamePost, numberOfRecruited+1, imgurl));
             } else {
                 List<String> inGameNickname = gamePostService.isPresentNickname(gamePost);
                 inGameNickname.add(0, gamePost.getMyIngameNickname());
-                myGamePostList.add(GamePostResDto.toDoneGamePostResDto(postTime, countTime, gamePost, inGameNickname, numberOfRecruited, imgurl));
+                myGamePostList.add(GamePostResDto.toDoneGamePostResDto(postTime, countTime, gamePost, inGameNickname, numberOfRecruited+1, imgurl));
             }
         }
 
@@ -66,11 +66,11 @@ public class MyPageService {
             String postTime = recruit.getGamePost().getCreatedAt().format(DateTimeFormatter.ofPattern("M월 d일 h시 m분"));
             String imgurl = amazonS3ResourceStorage.getimg(recruit.getGamePost().getPath());
             if (recruit.getGamePost().getRecruitStatus()) {
-                myGameRecruitList.add(0, GamePostResDto.toGamePostResDto(postTime, countTime, recruit.getGamePost(), numberOfRecruited, imgurl));
+                myGameRecruitList.add(0, GamePostResDto.toGamePostResDto(postTime, countTime, recruit.getGamePost(), numberOfRecruited+1, imgurl));
             } else {
                 List<String> inGameNickname = gamePostService.isPresentNickname(recruit.getGamePost());
                 inGameNickname.add(0, recruit.getGamePost().getMyIngameNickname());
-                myGameRecruitList.add(GamePostResDto.toDoneGamePostResDto(postTime, countTime, recruit.getGamePost(), inGameNickname, numberOfRecruited, imgurl));
+                myGameRecruitList.add(GamePostResDto.toDoneGamePostResDto(postTime, countTime, recruit.getGamePost(), inGameNickname, numberOfRecruited+1, imgurl));
             }
         }
         return myGameRecruitList;

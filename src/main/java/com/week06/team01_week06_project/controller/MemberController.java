@@ -15,32 +15,30 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/member")
 @RequiredArgsConstructor
 public class MemberController {
 
     private final JwtUtil jwtUtil;
     private final MemberService memberService;
 
-    @PostMapping("/idck")
+    @PostMapping("/member/idck")
     public GlobalResDto<?> idck(@RequestBody TestDto testDto){
         return memberService.idck(testDto);
     }
 
     //회원가입
-    @PostMapping("/signup")
+    @PostMapping("/member/signup")
     public GlobalResDto<?> signup(@RequestBody @Valid MemberReqDto memberReqDto){
         return memberService.signup(memberReqDto);
     }
 
     //로그인
-    @PostMapping("/login")
+    @PostMapping("/member/login")
     public GlobalResDto<?> login(@RequestBody @Valid LoginReqDto loginReqDto, HttpServletResponse response){
         return memberService.login(loginReqDto,response);
     }
 
-    //로그인한상태에서 탈퇴 가능 userid,pw 필요
-    //게시물과 참가신청을 하지 않은사람만 탈퇴 가능
+    //게임 모집하는 사이트 특성상 유저 탈퇴시 모든 모집글 삭제
     @DeleteMapping("/byemember")
     public GlobalResDto<?> deleMember(@AuthenticationPrincipal UserDetailsImpl userDetails,@RequestBody LoginReqDto loginReqDto){
         return memberService.deleMember(userDetails,loginReqDto);
