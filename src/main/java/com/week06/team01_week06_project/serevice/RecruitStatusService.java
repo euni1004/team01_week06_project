@@ -44,7 +44,7 @@ public class RecruitStatusService {
         recruitStatusRepository.save(recruitStatus);
 
         //만약 모집인원이 다찼다면 recruitstatus값을 false로 바꾸기
-        if (recruitStatusRepository.countByGamePost(gamePost) == gamePost.getNumberOfPeople()) {
+        if (recruitStatusRepository.countByGamePost(gamePost) +1 == gamePost.getNumberOfPeople()) {
             gamePost.updateRecruitStatus(false);
         }
 

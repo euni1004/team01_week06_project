@@ -16,7 +16,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class GamePost extends Timestamped{
+public class GamePost extends Timestamped {
 
     @Id
     @Column(name = "gamepostid")
@@ -40,7 +40,7 @@ public class GamePost extends Timestamped{
     private String myIngameNickname;
 
     @Column(nullable = false)
-    private long numberOfPeople;
+    private long numberOfPeople ;
 
     @Column(nullable = false)
     private boolean recruitStatus;
@@ -48,7 +48,7 @@ public class GamePost extends Timestamped{
 
     private String path;
 
-    public GamePost(Member member, GamepostReqDto gamepostReqDto,String path) {
+    public GamePost(Member member, GamepostReqDto gamepostReqDto, String path) {
         this.member = member;
         this.gameName = gamepostReqDto.getGamename();
         this.content = gamepostReqDto.getContent();
@@ -58,7 +58,7 @@ public class GamePost extends Timestamped{
         this.path = path;
     }
 
-    public void updatePost(PutGamepostReqDto putGamepostReqDto){
+    public void updatePost(PutGamepostReqDto putGamepostReqDto) {
         this.content = putGamepostReqDto.getContent();
         this.numberOfPeople = putGamepostReqDto.getNumberOfPeople();
     }
