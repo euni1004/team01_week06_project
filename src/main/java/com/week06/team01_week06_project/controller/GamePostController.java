@@ -21,32 +21,6 @@ public class GamePostController {
     private final GamePostService gamePostService;
 
     //게임모집글 작성
-
-//    public GlobalResDto<?> generateGamePost(@AuthenticationPrincipal UserDetailsImpl userDetails,
-//                                            @RequestPart(value = "gamename",required = false)String gameName,
-//                                            @RequestPart(value ="content",required = false)String content,
-//                                            @RequestPart(value ="inGameNickname",required = false) String inGameNickname,
-//                                            @RequestPart(value ="numberOfPeople",required = false) long numberOfPeople,
-//                                            @RequestPart(value ="file",required = false) MultipartFile multipartFile) {
-
-    //            , consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-//    @PostMapping(value = "/gamepost", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-//    public GlobalResDto<?> generateGamePost(@AuthenticationPrincipal UserDetailsImpl userDetails,
-//                                            @RequestParam(value = "content") GamepostReqDto content,
-//                                            @RequestPart(value = "multipartFile", required = false) MultipartFile multipartFile) {
-//
-//        Long memberid = userDetails.getAccount().getMemberId();
-//        log.info(content.getGameName());
-//        log.info(multipartFile.getOriginalFilename());
-////        log.info(gamepostReqDto.getGameName());
-////        log.info(gamepostReqDto.getInGameNickname());
-////        log.info(gamepostReqDto.getContent());
-////        log.info(String.valueOf(gamepostReqDto.getNumberOfPeople()));
-//        return null;
-////        GamepostReqDto gamepostReqDto = new GamepostReqDto(gameName,content,inGameNickname,numberOfPeople);
-////        return gamePostService.generateGamePost(memberid, content, multipartFile);
-//    }
-
     @PostMapping(value = "/gamepost", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public GlobalResDto<?> generateGamePost(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                             @RequestParam(required = false) String content,
