@@ -43,7 +43,7 @@ public class GamePost extends Timestamped {
     private long numberOfPeople ;
 
     @Column(nullable = false)
-    private boolean recruitStatus;
+    private boolean recruitStatus=true;
 
 
     private String path;

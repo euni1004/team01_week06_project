@@ -19,7 +19,9 @@ public enum ErrorCode {
 
     RECRUITSTATUS_ALREADY(HttpStatus.BAD_REQUEST.value(), "R001","참가신청은 한번만 가능합니다."),
     RECRUITSTATUS_NOT_FOUND(HttpStatus.BAD_REQUEST.value(), "R002","참가신청한 이력이 없습니다."),
-    NOT_RECRUIT_MYPOST(HttpStatus.BAD_REQUEST.value(), "R003","자신의 게시물에는 참가신청이 불가능 합니다.");
+    NOT_RECRUIT_MYPOST(HttpStatus.BAD_REQUEST.value(), "R003","자신의 게시물에는 참가신청이 불가능 합니다."),
+
+    NICKNAME_MUST_HAVE(HttpStatus.BAD_REQUEST.value(),"R001","닉네임은 반드시 입력해야합니다.");
 
 
     private final int status;
