@@ -7,7 +7,7 @@ import com.week06.team01_week06_project.dto.GlobalResDto;
 import com.week06.team01_week06_project.dto.request.GamepostReqDto;
 import com.week06.team01_week06_project.dto.request.PutGamepostReqDto;
 import com.week06.team01_week06_project.dto.response.GamePostResDto;
-import com.week06.team01_week06_project.exception.CustomException;
+import com.week06.team01_week06_project.exception.Error;
 import com.week06.team01_week06_project.exception.ErrorCode;
 import com.week06.team01_week06_project.respository.GamePostRepository;
 import com.week06.team01_week06_project.respository.MemberRepository;
@@ -38,21 +38,25 @@ public class GamePostService {
 
     @Transactional
     public GlobalResDto<?> generateGamePost(Long memberId, GamepostReqDto gamepostReqDto, MultipartFile multipartFile) {
+        System.out.println(gamepostReqDto.getInGameNickname());
+        if (gamepostReqDto.getInGameNickname().isEmpty()) {
+            return GlobalResDto.fail(new Error(ErrorCode.NICKNAME_MUST_HAVE));
+        }
         Member member = isPresentMember(memberId);
 
         if (member == null) {
-            throw new CustomException(ErrorCode.NOT_FOUND_MEMBER);
+            return GlobalResDto.fail(new Error(ErrorCode.NOT_FOUND_MEMBER));
         }
 
         if (gamepostReqDto.getNumberOfPeople() < 2 || gamepostReqDto.getNumberOfPeople() > 100) {
-            throw new CustomException(ErrorCode.NUMBER_OF_PEOPLE_ERROR);
+            return GlobalResDto.fail(new Error(ErrorCode.NUMBER_OF_PEOPLE_ERROR));
         }
 
         String path;
 
-        if (multipartFile.isEmpty()) {
+        if (multipartFile == null) {
             path = "images/normal.jpg";
-        }else {
+        } else {
             path = MultipartUtil.createPath(MultipartUtil.createFileId(), MultipartUtil.getFormat(multipartFile.getContentType()));
             amazonS3ResourceStorage.store(path, multipartFile);
         }
@@ -64,14 +68,14 @@ public class GamePostService {
 
     //모집글 수정하는 곳
     @Transactional
-    public GlobalResDto<GamePostResDto> putGamePost(UserDetailsImpl userDetails, PutGamepostReqDto putGamepostReqDto, Long gamePostId) {
+    public GlobalResDto<?> putGamePost(UserDetailsImpl userDetails, PutGamepostReqDto putGamepostReqDto, Long gamePostId) {
 
         GamePost gamePost = isPresentGamePost(gamePostId);
         if (gamePost == null) {
-            throw new CustomException(ErrorCode.NOT_FOUND_GAMEPOST);
+            return GlobalResDto.fail(new Error(ErrorCode.NOT_FOUND_MEMBER));
         }
         if (!userDetails.getAccount().getMemberId().equals(gamePost.getMember().getMemberId())) {
-            throw new CustomException(ErrorCode.NO_PERMISSION_CHANGE);
+            return GlobalResDto.fail(new Error(ErrorCode.NO_PERMISSION_CHANGE));
         }
         gamePost.updatePost(putGamepostReqDto);
 
@@ -84,10 +88,10 @@ public class GamePostService {
 
         GamePost gamePost = isPresentGamePost(gamePostId);
         if (gamePost == null) {
-            throw new CustomException(ErrorCode.NOT_FOUND_GAMEPOST);
+            return GlobalResDto.fail(new Error(ErrorCode.NOT_FOUND_GAMEPOST));
         }
         if (!userDetails.getAccount().getMemberId().equals(gamePost.getMember().getMemberId())) {
-            throw new CustomException(ErrorCode.NO_PERMISSION_DELETE);
+            return GlobalResDto.fail(new Error(ErrorCode.NO_PERMISSION_DELETE));
         }
 
         if (!gamePost.getPath().equals("images/normal.jpg")) {
@@ -132,10 +136,10 @@ public class GamePostService {
         return GlobalResDto.success(gamePostResDtos);
     }
 
-    public GlobalResDto<GamePostResDto> getGamePost(Long gamePostId) {
+    public GlobalResDto<?> getGamePost(Long gamePostId) {
         GamePost gamePost = isPresentGamePost(gamePostId);
         if (gamePost == null) {
-            throw new CustomException(ErrorCode.NOT_FOUND_GAMEPOST);
+            return GlobalResDto.fail(new Error(ErrorCode.NOT_FOUND_GAMEPOST));
         }
         Long numberOfRecruited = recruitStatusRepository.countByGamePost(gamePost);
         String countTime = countDate(gamePost.getCreatedAt());
@@ -193,7 +197,7 @@ public class GamePostService {
             } else if (betweenTime <= 6000) {
                 countTime = (betweenTime / 60) + "분 전";
             } else if (betweenTime <= 86400) {
-                countTime = (betweenTime / 360) + "시간 전";
+                countTime = (betweenTime / 60 / 60) + "시간 전";
             }
         } else if (period.getDays() < 7) {
             countTime = period.getDays() + "일 전";

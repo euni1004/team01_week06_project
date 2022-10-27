@@ -17,5 +17,10 @@ public class Error {
 
     private String message;
 
+    public Error(ErrorCode errorCode) {
+        this.status = errorCode.getStatus();
+        this.code = errorCode.getCode();
+        this.message = errorCode.getMessage();
+    }
 }
 

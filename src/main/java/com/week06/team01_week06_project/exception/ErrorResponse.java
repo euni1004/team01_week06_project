@@ -2,10 +2,12 @@ package com.week06.team01_week06_project.exception;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 
 @Getter
 @Builder
+@RequiredArgsConstructor
 public class ErrorResponse {
 
     private final int status;

@@ -5,7 +5,7 @@ import com.week06.team01_week06_project.domain.Member;
 import com.week06.team01_week06_project.domain.RecruitStatus;
 import com.week06.team01_week06_project.dto.GlobalResDto;
 import com.week06.team01_week06_project.dto.request.RecruitMemberDto;
-import com.week06.team01_week06_project.exception.CustomException;
+import com.week06.team01_week06_project.exception.Error;
 import com.week06.team01_week06_project.exception.ErrorCode;
 import com.week06.team01_week06_project.respository.GamePostRepository;
 import com.week06.team01_week06_project.respository.RecruitStatusRepository;
@@ -24,27 +24,31 @@ public class RecruitStatusService {
     private final RecruitStatusRepository recruitStatusRepository;
 
 
-    @Transactional
     public GlobalResDto<?> participationGame(UserDetailsImpl userDetails, RecruitMemberDto recruitMemberDto, Long gamaPostId) {
-        GamePost gamePost = isPresentGamePost(gamaPostId);
-        if (gamePost == null) {
-            throw  new CustomException(ErrorCode.NOT_FOUND_GAMEPOST);
+        if (recruitMemberDto.getInGameNickname().isEmpty()) {
+            return GlobalResDto.fail(new Error(ErrorCode.NICKNAME_MUST_HAVE));
         }
 
-        if(userDetails.getAccount().getMemberId().equals(gamePost.getMember().getMemberId())){
-            throw new CustomException(ErrorCode.NOT_RECRUIT_MYPOST);
+        GamePost gamePost = isPresentGamePost(gamaPostId);
+        if (gamePost == null) {
+            return GlobalResDto.fail(new Error(ErrorCode.NOT_FOUND_GAMEPOST));
+        }
+
+        if (userDetails.getAccount().getMemberId().equals(gamePost.getMember().getMemberId())) {
+            return GlobalResDto.fail(new Error(ErrorCode.NOT_FOUND_GAMEPOST));
         }
 
         RecruitStatus recruitStatus1 = isPresentRecruitStatus(gamePost, userDetails.getAccount());
         if (recruitStatus1 != null) {
-            throw new CustomException(ErrorCode.RECRUITSTATUS_ALREADY);
+//            throw new CustomException(ErrorCode.RECRUITSTATUS_ALREADY);
+            return GlobalResDto.fail(new Error(ErrorCode.RECRUITSTATUS_ALREADY));
         }
 
         RecruitStatus recruitStatus = new RecruitStatus(userDetails, gamePost, recruitMemberDto.getInGameNickname());
         recruitStatusRepository.save(recruitStatus);
 
         //만약 모집인원이 다찼다면 recruitstatus값을 false로 바꾸기
-        if (recruitStatusRepository.countByGamePost(gamePost) +1 == gamePost.getNumberOfPeople()) {
+        if (recruitStatusRepository.countByGamePost(gamePost) + 1 == gamePost.getNumberOfPeople()) {
             gamePost.updateRecruitStatus(false);
         }
 
@@ -55,12 +59,12 @@ public class RecruitStatusService {
     public GlobalResDto<?> cancelParticipationGame(UserDetailsImpl userDetails, Long gamepostid) {
         GamePost gamePost = isPresentGamePost(gamepostid);
         if (gamePost == null) {
-            throw  new CustomException(ErrorCode.NOT_FOUND_GAMEPOST);
+            return GlobalResDto.fail(new Error(ErrorCode.NOT_FOUND_GAMEPOST));
         }
 
         RecruitStatus recruitStatus = isPresentRecruitStatus(gamePost, userDetails.getAccount());
         if (recruitStatus == null) {
-            throw new CustomException(ErrorCode.RECRUITSTATUS_NOT_FOUND);
+            return GlobalResDto.fail(new Error(ErrorCode.RECRUITSTATUS_NOT_FOUND));
         }
 
         recruitStatusRepository.delete(recruitStatus);

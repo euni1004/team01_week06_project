@@ -7,13 +7,11 @@ import com.week06.team01_week06_project.dto.request.LoginReqDto;
 import com.week06.team01_week06_project.dto.request.MemberReqDto;
 import com.week06.team01_week06_project.dto.request.TestDto;
 import com.week06.team01_week06_project.dto.response.LoginResDto;
-import com.week06.team01_week06_project.exception.CustomException;
+import com.week06.team01_week06_project.exception.Error;
 import com.week06.team01_week06_project.exception.ErrorCode;
 import com.week06.team01_week06_project.jwt.JwtUtil;
 import com.week06.team01_week06_project.jwt.TokenDto;
-import com.week06.team01_week06_project.respository.GamePostRepository;
 import com.week06.team01_week06_project.respository.MemberRepository;
-import com.week06.team01_week06_project.respository.RecruitStatusRepository;
 import com.week06.team01_week06_project.respository.RefreshTokenRepository;
 import com.week06.team01_week06_project.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +32,8 @@ public class MemberService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     public GlobalResDto<?> signup(MemberReqDto memberReqDto) {
-        if(null!=isPresentMember(memberReqDto.getUserid())){
-            throw new CustomException(ErrorCode.DUPLICATED_NICKNAME);
+        if (null != isPresentMember(memberReqDto.getUserid())) {
+            return GlobalResDto.fail(new Error(ErrorCode.DUPLICATED_NICKNAME));
         }
 
         memberReqDto.setEncodePwd(passwordEncoder.encode(memberReqDto.getPw()));
@@ -45,13 +43,14 @@ public class MemberService {
         return GlobalResDto.success(null);
     }
 
-    public GlobalResDto<LoginResDto> login(LoginReqDto loginReqDto, HttpServletResponse response) {
+    public GlobalResDto<?> login(LoginReqDto loginReqDto, HttpServletResponse response) {
         Member member = isPresentMember(loginReqDto.getUserid());
         if (null == member) {
-            throw new CustomException(ErrorCode.NOT_FOUND_MEMBER);
+            return GlobalResDto.fail(new Error(ErrorCode.NOT_FOUND_MEMBER));
         }
         if (!member.validatePassword(passwordEncoder, loginReqDto.getPw())) {
-            throw new CustomException(ErrorCode.WRONG_PASSWORD);
+//            throw new CustomException(ErrorCode.WRONG_PASSWORD);
+            return GlobalResDto.fail(new Error(ErrorCode.WRONG_PASSWORD));
         }
 
         TokenDto tokenDto = jwtUtil.createAllToken(loginReqDto.getUserid());
@@ -72,7 +71,7 @@ public class MemberService {
 
     public GlobalResDto<?> idck(TestDto testDto) {
         if (null != isPresentMember(testDto.getUserid())) {
-            throw new CustomException(ErrorCode.DUPLICATED_NICKNAME);
+            return GlobalResDto.fail(new Error(ErrorCode.DUPLICATED_NICKNAME));
         }
         return GlobalResDto.success("사용가능한 아이디 입니다.");
     }
@@ -82,11 +81,11 @@ public class MemberService {
 
         Member member = isPresentMember(userDetails.getAccount().getUserid());
         if (null == member) {
-            throw new CustomException(ErrorCode.NOT_FOUND_MEMBER);
+            return GlobalResDto.fail(new Error(ErrorCode.NOT_FOUND_MEMBER));
         }
 
-        if(!member.validatePassword(passwordEncoder,loginReqDto.getPw())){
-            throw new CustomException(ErrorCode.WRONG_PASSWORD);
+        if (!member.validatePassword(passwordEncoder, loginReqDto.getPw())) {
+            return GlobalResDto.fail(new Error(ErrorCode.WRONG_PASSWORD));
         }
 
         memberRepository.deleteById(member.getMemberId());

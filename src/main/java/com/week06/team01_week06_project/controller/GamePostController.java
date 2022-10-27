@@ -50,7 +50,7 @@ public class GamePostController {
     @PostMapping(value = "/gamepost", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public GlobalResDto<?> generateGamePost(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                             @RequestParam(required = false) String content,
-                                            @RequestPart MultipartFile multipartFile) {
+                                            @RequestPart(required = false) MultipartFile multipartFile) {
 
         Long memberid = userDetails.getAccount().getMemberId();
 

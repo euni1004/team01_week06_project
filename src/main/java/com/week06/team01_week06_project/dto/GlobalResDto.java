@@ -17,5 +17,6 @@ public class GlobalResDto<T> {
         return new GlobalResDto<>(true,data);
     }
 
+    public static GlobalResDto<Object> fail(Object data){return new GlobalResDto<>(false,data);}
 
 }
