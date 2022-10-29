@@ -48,7 +48,7 @@ public class MemberService {
         if (null == member) {
             return GlobalResDto.fail(new Error(ErrorCode.NOT_FOUND_MEMBER));
         }
-        if (!member.validatePassword(passwordEncoder, loginReqDto.getPw())) {
+        if (member.validatePassword(passwordEncoder, loginReqDto.getPw())) {
 //            throw new CustomException(ErrorCode.WRONG_PASSWORD);
             return GlobalResDto.fail(new Error(ErrorCode.WRONG_PASSWORD));
         }
@@ -84,7 +84,7 @@ public class MemberService {
             return GlobalResDto.fail(new Error(ErrorCode.NOT_FOUND_MEMBER));
         }
 
-        if (!member.validatePassword(passwordEncoder, loginReqDto.getPw())) {
+        if (member.validatePassword(passwordEncoder, loginReqDto.getPw())) {
             return GlobalResDto.fail(new Error(ErrorCode.WRONG_PASSWORD));
         }
 

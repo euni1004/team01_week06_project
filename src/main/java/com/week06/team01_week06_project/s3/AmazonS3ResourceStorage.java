@@ -27,7 +27,6 @@ public class AmazonS3ResourceStorage {
             amazonS3Client.putObject(new PutObjectRequest(bucket, path, file)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
         } catch (Exception e) {
-            System.out.println("여기");
             throw new RuntimeException();
         } finally {
             if (file.exists()) {

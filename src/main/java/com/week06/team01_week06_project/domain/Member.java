@@ -43,6 +43,6 @@ public class Member extends Timestamped{
     }
 
     public boolean validatePassword(PasswordEncoder passwordEncoder, String pw) {
-        return passwordEncoder.matches(pw, this.pw);
+        return !passwordEncoder.matches(pw, this.pw);
     }
 }
